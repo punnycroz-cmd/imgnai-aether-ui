@@ -1002,7 +1002,8 @@
                     negative_prompt: dom.negativePrompt.value, 
                     seed: dom.seed && dom.seed.value ? Number(dom.seed.value) : null, 
                     nsfw: state.activeMode === 'nsfw',
-                    client_id: taskId
+                    client_id: taskId,
+                    realm: state.activeMode
                 };
                 state.tasks.unshift({ id: taskId, ...payload, displayCount: userQty, status: 'weaving', created: new Date().toLocaleString() });
             }
