@@ -549,15 +549,11 @@
                 </div>
             </div>
             <!-- Navigation -->
-            <nav class="flex items-center gap-2 bg-black/5 p-1 rounded-2xl border border-black/5">
+            <nav class="flex items-center gap-2 bg-black/5 p-1 rounded-2xl border border-black/5 mx-auto">
                 <button data-view="generate" class="nav-pill active px-6 py-2 rounded-xl font-bold uppercase tracking-widest text-[10px]">Forge</button>
                 <button data-view="tasks" class="nav-pill px-6 py-2 rounded-xl font-bold uppercase tracking-widest text-[10px]">Queue</button>
                 <button data-view="history" class="nav-pill px-6 py-2 rounded-xl font-bold uppercase tracking-widest text-[10px]">Vault</button>
             </nav>
-            <div class="flex items-center gap-2 shrink-0">
-                <button id="modeStandard" data-mode="standard" class="nav-pill px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest">Day</button>
-                <button id="modeNsfw" data-mode="nsfw" class="nav-pill px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest">Star</button>
-            </div>
         </div>
     </header>
 
@@ -606,68 +602,86 @@
 
                 <!-- Responsive Unified Console (Settings) -->
                 <div id="desktopConsole" class="bottom-console">
-                    <div class="glass-panel p-4 md:p-6 shadow-2xl border-2 border-[var(--accent)] relative">
+                    <div class="glass-panel p-4 md:p-5 shadow-2xl border-2 border-[var(--accent)] relative">
                         <!-- Toggle Button (Always Available) -->
-                         <button onclick="toggleConsole()" class="absolute -top-10 md:-top-12 left-1/2 -translate-x-1/2 bg-[var(--accent)] text-white px-4 md:px-6 py-2 rounded-t-xl font-bold text-[9px] md:text-[10px] uppercase tracking-widest shadow-lg flex items-center gap-2">
+                         <button onclick="toggleConsole()" class="absolute -top-10 md:-top-11 left-1/2 -translate-x-1/2 bg-[var(--accent)] text-white px-4 md:px-6 py-2 rounded-t-xl font-bold text-[9px] md:text-[10px] uppercase tracking-widest shadow-lg flex items-center gap-2">
                             <span id="consoleToggleText">Minimize</span>
                             <svg id="consoleToggleIcon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="transition-transform duration-500"><path d="m6 9 6 6 6-6"/></svg>
                          </button>
 
-                        <div class="console-content grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 items-center">
-                            <!-- Ordnance Group -->
-                            <div class="md:col-span-3 space-y-3 md:space-y-4">
-                                <div class="grid grid-cols-2 gap-3">
+                        <div class="console-content grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 items-stretch">
+                            <!-- Left: Configuration (4 cols) -->
+                            <div class="md:col-span-4 flex flex-col gap-3">
+                                <!-- Realm Toggle -->
+                                <div class="flex items-center gap-1 bg-[var(--panel-bg)] p-1 rounded-xl border border-[var(--panel-border)] h-10 shrink-0 mt-1 md:mt-0">
+                                    <button data-mode="standard" class="nav-pill active w-1/2 h-full rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all">Day</button>
+                                    <button data-mode="nsfw" class="nav-pill w-1/2 h-full rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all">Star</button>
+                                </div>
+                                
+                                <div class="space-y-1 shrink-0">
+                                    <label class="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] ml-1 opacity-80">Engine</label>
+                                    <select id="model" class="w-full h-10 px-3 font-bold text-sm"></select>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-3 shrink-0">
                                     <div class="space-y-1">
-                                        <label class="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] ml-1">Engine</label>
-                                        <select id="model" class="w-full h-10 px-3 font-bold text-base"></select>
+                                        <label class="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] ml-1 opacity-80">Fidelity</label>
+                                        <select id="quality" class="w-full h-10 px-3 font-bold text-sm"></select>
                                     </div>
                                     <div class="space-y-1">
-                                        <label class="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] ml-1">Visions</label>
-                                        <select id="count" class="w-full h-10 px-3 font-bold text-base">
-                                            <option value="1">1 Spirit</option>
-                                            <option value="2">2 Spirits</option>
-                                            <option value="3">3 Spirits</option>
-                                            <option value="4">4 Spirits</option>
+                                        <label class="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] ml-1 opacity-80">Canvas</label>
+                                        <select id="aspect" class="w-full h-10 px-3 font-bold text-sm"></select>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3 shrink-0">
+                                    <div class="space-y-1">
+                                        <label class="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] ml-1 opacity-80">Spirits</label>
+                                        <select id="count" class="w-full h-10 px-3 font-bold text-sm">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4" selected>4</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div class="space-y-1"><label class="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] ml-1">Fidelity</label><select id="quality" class="w-full h-10 px-3 font-bold text-base"></select></div>
-                                    <div class="space-y-1"><label class="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] ml-1">Canvas</label><select id="aspect" class="w-full h-10 px-3 font-bold text-base"></select></div>
-                                </div>
-                            </div>
-
-                            <!-- The Vision Group -->
-                            <div class="md:col-span-5 space-y-1">
-                                <div class="flex items-center justify-between px-1">
-                                    <label class="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)]">The Vision</label>
-                                    <div class="flex gap-2">
-                                        <button onclick="clearPrompt()" class="text-[10px] font-bold uppercase text-red-400 hover:text-red-300 transition-colors">Clear</button>
-                                        <button onclick="pastePrompt()" class="text-[10px] font-bold uppercase text-[var(--accent)] hover:text-white transition-colors">Paste</button>
+                                    <div class="space-y-1">
+                                        <label class="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] ml-1 opacity-80">Seed</label>
+                                        <input id="seed" type="number" placeholder="Divine" class="w-full h-10 px-3 font-bold text-sm">
                                     </div>
                                 </div>
-                                <textarea id="prompt" placeholder="Describe the unseen..." class="w-full h-24 md:h-24 p-3 resize-none text-base"></textarea>
                             </div>
 
-                            <!-- Wards & Seed -->
-                            <div class="md:col-span-2 space-y-3 md:space-y-4">
-                                <div class="space-y-1">
-                                    <label class="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] ml-1">Wards</label>
-                                    <textarea id="negativePrompt" class="w-full h-12 md:h-16 p-2 text-sm resize-none"></textarea>
+                            <!-- Right: The Vision & Action (8 cols) -->
+                            <div class="md:col-span-8 flex flex-col gap-3 h-full">
+                                <div class="flex-1 flex flex-col space-y-1">
+                                    <div class="flex items-center justify-between px-1">
+                                        <label class="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] opacity-80">The Vision</label>
+                                        <div class="flex gap-3">
+                                            <button onclick="clearPrompt()" class="text-[9px] font-bold uppercase text-red-400 hover:text-red-300 transition-colors">Clear</button>
+                                            <button onclick="pastePrompt()" class="text-[9px] font-bold uppercase text-[var(--accent)] hover:text-[var(--text-main)] transition-colors">Paste</button>
+                                        </div>
+                                    </div>
+                                    <textarea id="prompt" placeholder="What do you seek to manifest?" class="w-full flex-1 min-h-[4.5rem] p-3 resize-none text-sm leading-relaxed"></textarea>
                                 </div>
-                                <input id="seed" type="number" placeholder="Random Seed" class="w-full h-10 px-3 font-bold text-base">
-                            </div>
-
-                            <!-- Manifest Action -->
-                            <div class="md:col-span-2">
-                                <button id="generateBtn" class="w-full h-16 md:h-24 btn-magic flex md:flex-col items-center justify-center gap-2 shadow-xl">
-                                    <span id="btnText" class="text-base font-bold uppercase tracking-widest">Manifest</span>
-                                    <div id="btnLoader" class="hidden"><div class="loader"></div></div>
-                                </button>
+                                
+                                <!-- Wards and Manifest button row -->
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 shrink-0">
+                                    <div class="md:col-span-3 space-y-1">
+                                        <label class="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] ml-1 opacity-80">Wards (Negative)</label>
+                                        <textarea id="negativePrompt" placeholder="What shall be banished?" class="w-full h-12 px-3 py-2 text-xs resize-none"></textarea>
+                                    </div>
+                                    <div class="md:col-span-1 flex flex-col justify-end">
+                                        <button id="generateBtn" class="w-full h-12 btn-magic flex items-center justify-center gap-2 shadow-xl rounded-xl">
+                                            <span id="btnText" class="text-sm font-bold uppercase tracking-widest">Manifest</span>
+                                            <div id="btnLoader" class="hidden"><div class="loader w-5 h-5 border-2"></div></div>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>            </div>
+                </div>
+            </div>
 
         </section>
 
@@ -745,12 +759,12 @@
             { "name": "Rend", "profile": "rend", "default_n_steps": 40, "default_guidance_scale": 6, "default_strength": 0.76, "default_negative_prompt": "worst_quality, bad_quality, poorly_detailed, long neck" },
             { "name": "Pony", "profile": "pony", "default_n_steps": 30, "default_guidance_scale": 6, "default_strength": 0.76, "default_negative_prompt": "score_6, score_5, score_4, nsfw, pumpkin, 3d, blurry, cropped, signature, username, watermark, jpeg artifacts, normal quality, worst quality, low quality, (missing fingers, extra digits, extra fingers, fewer digits, bad hands:1.3), bad eye,(deformed, dist" },
             { "name": "Neo", "profile": "neo", "default_n_steps": 35, "default_guidance_scale": 4, "default_strength": 0.76, "default_negative_prompt": "" },
-            { "name": "Nai", "profile": "nai", "default_n_steps": 50, "default_guidance_scale": 7, "default_strength": 0.76, "default_negative_prompt": "child, loli, young, source_furry, source_pony, monochrome, 3d, censored, (worst quality, low quality:1.4), (jpeg artifacts:1.4), negative_hand, negative_hand-neg, watermark, signature, text" },
+            { "name": "Nai", "profile": "nai", "default_n_steps": 50, "default_guidance_scale": 7, "default_strength": 0.76, "default_negative_prompt": "child, loli, young, source_furry, source_pony, monochrome, 3d, censored, (worst quality, low quality:1.4), (jpeg artifacts:1.4), negative_hand, watermark, signature, text" },
             { "name": "Retro", "profile": "retro", "default_n_steps": 30, "default_guidance_scale": 5, "default_strength": 0.76, "default_negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digits, fewer digits, cropped, jpeg artifacts, signature, watermark, username, blurry, artist name, old, early, lowres, logo, mutated hands, mammal, anthro, furry" },
             { "name": "Supra", "profile": "supra", "default_n_steps": 50, "default_guidance_scale": 2, "default_strength": 0.76, "default_negative_prompt": "(deformed iris, deformed pupils), worst quality, low quality, blurry, text" },
-            { "name": "Evo", "profile": "evo", "default_n_steps": 40, "default_guidance_scale": 7, "default_strength": 0.76, "default_negative_prompt": "(worst quality, low quality, illustration, 3d, 2d, painting, cartoons, sketch), open mouth, watermark)" },
+            { "name": "Evo", "profile": "evo", "default_n_steps": 40, "default_guidance_scale": 7, "default_strength": 0.76, "default_negative_prompt": "(worst quality, low quality, illustration, 3d, 2d, painting, cartoons, sketch), open mouth, watermark" },
             { "name": "Toon", "profile": "toon", "default_n_steps": 53, "default_guidance_scale": 7, "default_strength": 0.76, "default_negative_prompt": "score_6, score_5, score_4, ugly face, mutated hands, ahegao, bad eyes, monochrome, sketch, ugly style" },
-            { "name": "HyperX", "profile": "hyperx", "default_n_steps": 28, "default_guidance_scale": 7, "default_strength": 0.76, "default_negative_prompt": "blur, bad quality, bad composition, copyright, watermark, lineart, pixelated, pixelated, painting, sketch" },
+            { "name": "HyperX", "profile": "hyperx", "default_n_steps": 28, "default_guidance_scale": 7, "default_strength": 0.76, "default_negative_prompt": "blur, bad quality, bad composition, copyright, watermark, lineart, pixelated, pixelart, drawing, painting, sketch" },
             { "name": "FurXL Classic", "profile": "furxl", "default_n_steps": 40, "default_guidance_scale": 7, "default_strength": 0.76, "default_negative_prompt": "(worst quality, low quality), watermarks, signature, (interlocked fingers)" },
             { "name": "Illustrious", "profile": "illustrious", "default_n_steps": 53, "default_guidance_scale": 7, "default_strength": 0.76, "default_negative_prompt": "bad quality, worst quality, worst detail, sketch, censor, signature, watermark, patreon username, patreon logo" },
             { "name": "Real Amateurs", "profile": "real_amateurs", "default_n_steps": 25, "default_guidance_scale": 3.5, "default_strength": 0.76, "default_negative_prompt": "asymmetrical-eyes, mismatched eyes, deformed eyes, (turkey-neck:1.2)" },
@@ -1015,7 +1029,7 @@
                     dom.btnText.textContent = "Weaving..."; 
                     dom.btnLoader.classList.remove('hidden');
                 } else {
-                    dom.btnText.textContent = "Forge Vision";
+                    dom.btnText.textContent = "Manifest";
                     dom.btnLoader.classList.add('hidden');
                 }
             };
