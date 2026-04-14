@@ -245,6 +245,10 @@
     <div id="footerStatus" class="fixed bottom-10 left-1/2 -translate-x-1/2 glass-panel py-3 px-8 text-xs font-bold transition-all translate-y-32 opacity-0 pointer-events-none z-[150]"></div>
 
     <script>
+        // Render / Environment Placeholders
+        window.__SERVER_URL__ = "__SERVER_URL__";
+        window.__SERVER_URL_NSFW__ = "__SERVER_URL_NSFW__";
+
         const SFW_MODELS = [
             { "name": "Ani", "profile": "ani" }, { "name": "Aura", "profile": "aura" }, { "name": "Evo", "profile": "evo" },
             { "name": "Flux1 D", "profile": "flux1d" }, { "name": "Fur", "profile": "fur" }, { "name": "Gen", "profile": "gen" },
@@ -256,8 +260,25 @@
             { "name": "Real Amateurs", "profile": "real_amateurs" }
         ];
         
+        /**
+         * Resolves the correct backend URL based on current mode and env variables
+         */
+        function resolveServerUrl(mode) {
+            const std = window.__SERVER_URL__;
+            const nsfw = window.__SERVER_URL_NSFW__;
+            
+            // Checks if the placeholder string is still present
+            const isUnresolved = (val) => !val || val.startsWith("__") || val.includes("REPLACE");
+            
+            const finalStd = isUnresolved(std) ? window.location.origin : std;
+            const finalNsfw = isUnresolved(nsfw) ? finalStd : nsfw;
+            
+            const target = mode === 'nsfw' ? finalNsfw : finalStd;
+            return target.replace(/\/$/, "");
+        }
+
         let state = { 
-            serverUrl: window.location.origin, 
+            serverUrl: resolveServerUrl('standard'), 
             activeMode: localStorage.getItem("a_mode") || 'standard',
             tasks: [],
             history: JSON.parse(localStorage.getItem("a_history") || "[]")
@@ -279,6 +300,8 @@
 
         function applyMode(mode) {
             state.activeMode = mode; document.body.dataset.mode = mode;
+            state.serverUrl = resolveServerUrl(mode); // Update URL on toggle
+            
             const models = mode === 'nsfw' ? NSFW_MODELS : SFW_MODELS;
             dom.model.innerHTML = models.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
             dom.quality.innerHTML = ['Fast', 'High Quality'].map(q => `<option value="${q}">${q}</option>`).join('');
@@ -341,7 +364,7 @@
                 const wrapper = document.createElement('div');
                 wrapper.className = 'bubble';
                 wrapper.id = `bubble-${taskId}-${idx}`;
-                const vaulted = url.includes('.r2.dev') ? '<span class="vault-badge">Vaulted</span>' : '';
+                const vaulted = (url.includes('.r2.dev') || url.includes('cloudflare')) ? '<span class="vault-badge">Vaulted</span>' : '';
                 wrapper.innerHTML = `
                     ${vaulted}
                     <div class="bubble-img-overlay"><img src="${url}" loading="lazy"></div>
@@ -356,6 +379,7 @@
 
         function popBubble(el, url) {
             const canvas = el.querySelector('canvas');
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
             const particles = [];
             for (let i = 0; i < 40; i++) {
@@ -392,7 +416,7 @@
             dom.historyList.innerHTML = state.history.flatMap(entry => 
                 entry.image_urls.map(url => `
                     <div class="art-frame" onclick="popBubble(this, '${url}')">
-                        ${url.includes('.r2.dev') ? '<span class="vault-badge">Vaulted</span>' : ''}
+                        ${(url.includes('.r2.dev') || url.includes('cloudflare')) ? '<span class="vault-badge">Vaulted</span>' : ''}
                         <img src="${url}" class="w-full aspect-square object-cover" loading="lazy">
                     </div>
                 `)
@@ -410,7 +434,12 @@
             document.getElementById('consoleToggleText').textContent = isMin ? 'Expand' : 'Minimize';
         }
         
-        async function pastePrompt() { dom.prompt.value = await navigator.clipboard.readText(); }
+        async function pastePrompt() { 
+            try {
+                const text = await navigator.clipboard.readText();
+                dom.prompt.value = text;
+            } catch(e) { setFooterMsg("Clipboard permission denied."); }
+        }
         function clearPrompt() { dom.prompt.value = ''; }
         function clearVault() { if(confirm("Purge Vault?")) { state.history = []; localStorage.removeItem("a_history"); renderHistory(); } }
 
