@@ -356,15 +356,27 @@
           <select id="model" class="w-full h-9 px-3 font-bold text-xs"></select>
         </div>
         <div class="grid grid-cols-2 gap-3">
-          <select id="quality" class="w-full h-9 px-3 font-bold text-xs"></select>
-          <select id="aspect" class="w-full h-9 px-3 font-bold text-xs"></select>
+          <div class="space-y-1">
+            <label class="text-[9px] font-bold uppercase opacity-50 ml-1">Quality</label>
+            <select id="quality" class="w-full h-9 px-3 font-bold text-xs"></select>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[9px] font-bold uppercase opacity-50 ml-1">Size</label>
+            <select id="aspect" class="w-full h-9 px-3 font-bold text-xs"></select>
+          </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
-          <select id="count" class="w-full h-9 px-3 font-bold text-xs">
-            <option value="1">1 Spirit</option>
-            <option value="4" selected>4 Spirits</option>
-          </select>
-          <input id="seed" type="number" placeholder="Divine Seed" class="w-full h-9 px-3 font-bold text-xs">
+          <div class="space-y-1">
+            <label class="text-[9px] font-bold uppercase opacity-50 ml-1">Images</label>
+            <select id="count" class="w-full h-9 px-3 font-bold text-xs">
+              <option value="1">1 Spirit</option>
+              <option value="4" selected>4 Spirits</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[9px] font-bold uppercase opacity-50 ml-1">Seed</label>
+            <input id="seed" type="number" placeholder="Divine Seed" class="w-full h-9 px-3 font-bold text-xs">
+          </div>
         </div>
       </div>
 
@@ -398,16 +410,19 @@
     window.__SERVER_URL__ = "__SERVER_URL__";
     window.__SERVER_URL_NSFW__ = "__SERVER_URL_NSFW__";
 
-    const SFW_MODELS = [
-      { name: "Ani", profile: "ani" }, { name: "Aura", profile: "aura" }, { name: "Evo", profile: "evo" },
-      { name: "Flux1 D", profile: "flux1d" }, { name: "Fur", profile: "fur" }, { name: "Gen", profile: "gen" },
-      { name: "Hyper CGI", profile: "hypercgi" }, { name: "Neo", profile: "neo" }
+    const DAY_MODELS = [
+      "Gen", "Ani", "Synth", "Fur", "Noob", "Aura", "Pixel", "Hyper CGI",
+      "Volt", "Muse", "Gothic", "Rend", "Retro", "Pony", "Neo", "Nai",
+      "Glitch", "Flux1 D", "Supra", "Evo", "Toon", "Wassie", "HyperX", "FurXL Classic"
     ];
-    const NSFW_MODELS = [
-      { name: "Gen", profile: "gen" }, { name: "Real Classic", profile: "realclassic" },
-      { name: "Synth", profile: "synth" }, { name: "Toon", profile: "toon" },
-      { name: "Real Amateurs", profile: "real_amateurs" }
+    const STAR_MODELS = [
+      "Gen", "Ani", "Synth", "Fur", "Noob", "Aura", "Pixel", "Hyper CGI",
+      "Volt", "Muse", "Rend", "Pony", "Neo", "Nai", "Retro", "Supra",
+      "Evo", "Toon", "HyperX", "FurXL Classic", "Illustrious", "Real Amateurs",
+      "RealX", "Real Classic"
     ];
+    const ASPECT_CHOICES = ["1:1", "16:9", "5:2", "4:5", "4:7"];
+    const QUALITY_CHOICES = ["Fast", "High Quality"];
 
     const state = {
       serverUrl: "",
@@ -488,20 +503,17 @@
       const previousModel = dom.model.value || localStorage.getItem("a_model") || "";
       const previousQuality = dom.quality.value || localStorage.getItem("a_quality") || "";
       const previousAspect = dom.aspect.value || localStorage.getItem("a_aspect") || "";
-      const models = mode === "nsfw" ? NSFW_MODELS : SFW_MODELS;
-      dom.model.innerHTML = models.map(m => `<option value="${m.name}">${m.name}</option>`).join("");
-      dom.quality.innerHTML = ["Fast", "High Quality"]
+      const models = mode === "nsfw" ? STAR_MODELS : DAY_MODELS;
+      dom.model.innerHTML = models.map(name => `<option value="${name}">${name}</option>`).join("");
+      dom.quality.innerHTML = QUALITY_CHOICES
         .map(q => `<option value="${q}">${q}</option>`).join("");
-      dom.aspect.innerHTML = ["1:1", "16:9", "4:5", "4:7"]
+      dom.aspect.innerHTML = ASPECT_CHOICES
         .map(a => `<option value="${a}">${a}</option>`).join("");
       document.querySelectorAll("[data-mode]").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
       localStorage.setItem("a_mode", mode);
-      const modelNames = models.map(m => m.name);
-      dom.model.value = modelNames.includes(previousModel) ? previousModel : (localStorage.getItem("a_model") || modelNames[0] || "Gen");
-      const qualityValues = Array.from(dom.quality.options).map(opt => opt.value);
-      dom.quality.value = qualityValues.includes(previousQuality) ? previousQuality : qualityValues[0] || "Fast";
-      const aspectValues = Array.from(dom.aspect.options).map(opt => opt.value);
-      dom.aspect.value = aspectValues.includes(previousAspect) ? previousAspect : aspectValues[0] || "1:1";
+      dom.model.value = models.includes(previousModel) ? previousModel : (models[0] || "Gen");
+      dom.quality.value = QUALITY_CHOICES.includes(previousQuality) ? previousQuality : QUALITY_CHOICES[0];
+      dom.aspect.value = ASPECT_CHOICES.includes(previousAspect) ? previousAspect : ASPECT_CHOICES[0];
       localStorage.setItem("a_model", dom.model.value);
       localStorage.setItem("a_quality", dom.quality.value);
       localStorage.setItem("a_aspect", dom.aspect.value);
