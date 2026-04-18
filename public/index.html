@@ -282,6 +282,7 @@
         <a id="bubbleRevealDownload" href="#" download class="px-6 py-2 btn-magic text-[10px] font-bold uppercase tracking-widest">Save Image</a>
         <button id="resumeFromModal" onclick="resumeSelectedJob()" class="px-6 py-2 btn-magic text-[10px] font-bold uppercase tracking-widest">Resume Job</button>
       </div>
+      <div id="bubbleRevealThumbs" class="mt-6 grid grid-cols-4 gap-2 max-w-[90vw]"></div>
     </div>
   </div>
 
@@ -775,6 +776,35 @@
       setTimeout(() => reveal.style.display = "none", 350);
     }
 
+    function openHistoryGroup(entry) {
+      const urls = (entry.images || []).map(img => img.r2_url).filter(Boolean);
+      if (!urls.length) return;
+      const reveal = document.getElementById("bubbleReveal");
+      const img = document.getElementById("bubbleRevealImg");
+      const dl = document.getElementById("bubbleRevealDownload");
+      const thumbs = document.getElementById("bubbleRevealThumbs");
+      const resumeBtn = document.getElementById("resumeFromModal");
+      img.src = urls[0];
+      dl.href = urls[0];
+      thumbs.innerHTML = urls.map((url, idx) => `
+        <button class="art-frame overflow-hidden border border-white/10" data-thumb="${idx}">
+          <img src="${url}" class="w-full aspect-square object-cover" loading="lazy" alt="Vault image ${idx + 1}">
+        </button>
+      `).join("");
+      thumbs.querySelectorAll("[data-thumb]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const url = urls[Number(btn.dataset.thumb)];
+          img.src = url;
+          dl.href = url;
+        });
+      });
+      resumeBtn.style.display = entry.request_id ? "inline-flex" : "none";
+      resumeBtn.onclick = () => entry.request_id ? resumeRequest(entry.request_id) : undefined;
+      reveal.style.display = "flex";
+      setTimeout(() => reveal.classList.add("active"), 10);
+    }
+
     async function loadHistoryPage() {
       if (state.loadingHistory || !state.historyHasMore) return;
       state.loadingHistory = true;
@@ -787,7 +817,11 @@
 
         items.forEach(entry => {
           const wrap = document.createElement("div");
-          wrap.className = "glass-panel p-3";
+          wrap.className = "glass-panel p-3 cursor-pointer";
+          wrap.addEventListener("click", (e) => {
+            if (e.target.closest("button")) return;
+            openHistoryGroup(entry);
+          });
           wrap.innerHTML = `
             <div class="flex items-center justify-between gap-2 mb-3">
               <div class="min-w-0">
@@ -798,7 +832,7 @@
             </div>
             <div class="grid grid-cols-2 gap-2">
               ${(entry.images || []).map(img => `
-                <div class="art-frame">
+                <div class="art-frame pointer-events-none">
                   <img src="${img.r2_url}" class="w-full aspect-square object-cover" loading="lazy" alt="Vault image">
                 </div>
               `).join("")}
