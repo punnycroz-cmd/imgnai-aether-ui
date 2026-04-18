@@ -485,15 +485,26 @@
       state.activeMode = mode;
       document.body.dataset.mode = mode;
       state.serverUrl = resolveServerUrl(mode);
+      const previousModel = dom.model.value || localStorage.getItem("a_model") || "";
+      const previousQuality = dom.quality.value || localStorage.getItem("a_quality") || "";
+      const previousAspect = dom.aspect.value || localStorage.getItem("a_aspect") || "";
       const models = mode === "nsfw" ? NSFW_MODELS : SFW_MODELS;
       dom.model.innerHTML = models.map(m => `<option value="${m.name}">${m.name}</option>`).join("");
-      dom.quality.innerHTML = (mode === "nsfw" ? ["Fast", "High Quality"] : ["Fast", "High Quality", "4k+"])
+      dom.quality.innerHTML = ["Fast", "High Quality"]
         .map(q => `<option value="${q}">${q}</option>`).join("");
       dom.aspect.innerHTML = ["1:1", "16:9", "4:5", "4:7"]
         .map(a => `<option value="${a}">${a}</option>`).join("");
       document.querySelectorAll("[data-mode]").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
       localStorage.setItem("a_mode", mode);
-      dom.model.value = models[0]?.name || "Gen";
+      const modelNames = models.map(m => m.name);
+      dom.model.value = modelNames.includes(previousModel) ? previousModel : (localStorage.getItem("a_model") || modelNames[0] || "Gen");
+      const qualityValues = Array.from(dom.quality.options).map(opt => opt.value);
+      dom.quality.value = qualityValues.includes(previousQuality) ? previousQuality : qualityValues[0] || "Fast";
+      const aspectValues = Array.from(dom.aspect.options).map(opt => opt.value);
+      dom.aspect.value = aspectValues.includes(previousAspect) ? previousAspect : aspectValues[0] || "1:1";
+      localStorage.setItem("a_model", dom.model.value);
+      localStorage.setItem("a_quality", dom.quality.value);
+      localStorage.setItem("a_aspect", dom.aspect.value);
       renderHistory(true);
       refreshCurrentJob();
     }
@@ -882,6 +893,9 @@
     }));
 
     document.querySelectorAll("[data-mode]").forEach(btn => btn.addEventListener("click", () => applyMode(btn.dataset.mode)));
+    dom.model.addEventListener("change", () => localStorage.setItem("a_model", dom.model.value));
+    dom.quality.addEventListener("change", () => localStorage.setItem("a_quality", dom.quality.value));
+    dom.aspect.addEventListener("change", () => localStorage.setItem("a_aspect", dom.aspect.value));
     dom.generateBtn.addEventListener("click", runGeneration);
 
     applyMode(state.activeMode);
