@@ -523,6 +523,7 @@
     }
 
     function getPayload() {
+      const realm = state.activeMode === "nsfw" ? "star" : "day";
       return {
         prompt: dom.prompt.value.trim(),
         model: dom.model.value,
@@ -532,7 +533,8 @@
         quality: dom.quality.value,
         negative_prompt: dom.negativePrompt.value.trim(),
         seed: dom.seed.value ? parseInt(dom.seed.value, 10) : null,
-        client_id: `client-${Date.now()}`
+        client_id: `client-${Date.now()}`,
+        realm
       };
     }
 
@@ -720,7 +722,7 @@
 
       updateTasksView({
         request_id: requestId,
-        realm: payload?.nsfw ? "star" : "day",
+        realm: payload?.realm || (payload?.nsfw ? "star" : "day"),
         status: "done",
         prompt: payload?.prompt,
         model: payload?.model,
