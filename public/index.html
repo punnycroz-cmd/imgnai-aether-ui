@@ -433,6 +433,7 @@
       historyPage: 1,
       historyLimit: 20,
       historyHasMore: true,
+      historyLoaded: false,
       loadingHistory: false,
       currentPoll: null
     };
@@ -518,7 +519,7 @@
       localStorage.setItem("a_model", dom.model.value);
       localStorage.setItem("a_quality", dom.quality.value);
       localStorage.setItem("a_aspect", dom.aspect.value);
-      renderHistory(true);
+      
       refreshCurrentJob();
     }
 
@@ -731,6 +732,7 @@
         created_at: meta?.created_at || new Date().toISOString(),
       });
       setFooterMsg("Vault updated.", "info");
+      state.historyLoaded = false;
     }
 
     function popBubble(el, url) {
@@ -815,7 +817,10 @@
       try {
         const res = await apiFetch(`/history?page=${state.historyPage}&limit=${state.historyLimit}`, { method: "GET", headers: {} });
         const items = res.items || [];
-        if (state.historyPage === 1) dom.historyList.innerHTML = "";
+        if (state.historyPage === 1) {
+          dom.historyList.innerHTML = "";
+          state.historyLoaded = true;
+        }
 
         items.forEach(entry => {
           const wrap = document.createElement("div");
@@ -858,10 +863,13 @@
 
     async function renderHistory(reset = false) {
       if (!dom.historyList) return;
+      if (document.getElementById("view-history").classList.contains("hidden")) return;
+      
+      if (state.historyLoaded && !reset) return;
+
       state.historyPage = 1;
       state.historyHasMore = true;
       if (reset) dom.historyList.innerHTML = "";
-      if (document.getElementById("view-history").classList.contains("hidden")) return;
       await loadHistoryPage();
     }
 
@@ -870,10 +878,8 @@
     }
 
     async function reloadHistory() {
-      state.historyPage = 1;
-      state.historyHasMore = true;
-      dom.historyList.innerHTML = "";
-      await loadHistoryPage();
+      state.historyLoaded = false;
+      await renderHistory(true);
     }
 
     function clearVault() {
@@ -937,7 +943,7 @@
       document.getElementById(`view-${view}`).classList.remove("hidden");
       document.querySelectorAll("[data-view]").forEach(b => b.classList.remove("active"));
       e.currentTarget.classList.add("active");
-      if (view === "history") renderHistory(true);
+      if (view === "history") renderHistory(false);
     }));
 
     document.querySelectorAll("[data-mode]").forEach(btn => btn.addEventListener("click", () => applyMode(btn.dataset.mode)));
