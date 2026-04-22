@@ -149,7 +149,8 @@
     @media (max-width: 768px) {
       html { font-size: 14px; }
       h2.cinematic-text { font-size: 1.75rem !important; }
-      main { padding-top: 4rem; padding-bottom: 35rem; }
+      main { padding-top: 3.5rem; padding-bottom: 38rem; }
+      .bottom-console { bottom: 5rem !important; }
     }
 
     .mobile-nav-item svg {
@@ -427,8 +428,7 @@
           </svg>
         </div>
         <div class="min-w-0">
-          <h1 class="text-xl sm:text-2xl font-black cinematic-text tracking-[0.25em] truncate">AETHER</h1>
-          <p class="text-[10px] uppercase tracking-[0.3em] text-[var(--text-muted)]">PromptStore frontend</p>
+          <h1 class="text-2xl sm:text-3xl font-black cinematic-text tracking-[0.3em] truncate text-[var(--accent)]">AETHER WORLD</h1>
         </div>
       </div>
 
@@ -502,7 +502,7 @@
   <main id="mainContent">
     <section id="view-generate" class="view">
       <div class="max-w-7xl mx-auto px-4 sm:px-8">
-        <div class="glass-panel p-4 sm:p-6 mb-6">
+        <div class="hidden sm:block glass-panel p-4 sm:p-6 mb-6">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h2 class="text-3xl sm:text-4xl font-bold cinematic-text">Manifestations</h2>
@@ -674,7 +674,7 @@
   </div>
 
   <!-- Mobile Nav -->
-  <nav class="sm:hidden fixed bottom-6 left-6 right-6 z-[180] glass-panel p-2 flex items-center justify-around shadow-2xl border-b-4 border-b-[var(--accent)]">
+  <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-[200] glass-panel p-4 rounded-b-none border-t border-[var(--panel-border)] flex items-center justify-around shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
     <button data-view="generate" class="mobile-nav-item flex flex-col items-center p-2 transition-all opacity-60 active">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
