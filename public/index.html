@@ -345,40 +345,25 @@
     }
 
     .bottom-console.minimized {
-      transform: translate(-50%, calc(100% - 1.5rem));
-      opacity: 0.94;
-    }
-
-    /* Tablet and larger sizing */
-    @media (min-width: 1024px) {
-      .bottom-console.minimized {
-         transform: translate(-50%, calc(100% - 3.5rem));
-      }
-    }
-
-    .divine-hand {
-      position: absolute;
-      top: -60px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px) rotate(180deg);
-      width: 100px;
-      height: 100px;
-      pointer-events: none;
+      transform: translate(-50%, calc(100%));
       opacity: 0;
-      transition: all 0.5s ease;
-      filter: drop-shadow(0 0 15px var(--accent));
-      z-index: -1;
+      pointer-events: none;
     }
 
-    .bottom-console.minimized .divine-hand {
-      opacity: 0.4;
-      transform: translateX(-50%) translateY(0) rotate(180deg);
-      animation: beckon 3s infinite ease-in-out;
+    #mobileToggleStub {
+       display: none;
+       position: absolute;
+       top: -38px;
+       left: 50%;
+       transform: translateX(-50%);
+       z-index: 1001;
     }
 
-    @keyframes beckon {
-      0%, 100% { transform: translateX(-50%) translateY(0) rotate(180deg); }
-      50% { transform: translateX(-50%) translateY(-10px) rotate(180deg); }
+
+    @media (max-width: 768px) {
+      .bottom-console.minimized + .mobile-nav .console-toggle-btn-overlay {
+         display: block;
+      }
     }
 
 
@@ -478,56 +463,27 @@
     </div>
   </header>
 
-  <div id="bubbleReveal" class="bubble-image-reveal" onclick="closeBubbleReveal(event)">
-    <div class="reveal-content flex flex-col lg:flex-row" onclick="event.stopPropagation()">
-      <button onclick="closeBubbleReveal()" class="reveal-close">&times;</button>
+  <div id="bubbleReveal" class="fixed inset-0 z-[2000] hidden flex-col items-center justify-start p-4 sm:p-12 bg-black/80 backdrop-blur-md overflow-y-auto" onclick="closeBubbleReveal(event)">
+    <!-- Floating Image -->
+    <div class="relative max-w-full flex items-center justify-center my-auto pt-8 pb-4" onclick="event.stopPropagation()">
+       <img id="bubbleRevealImg" src="" alt="Manifestation" class="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-[0_20px_80px_rgba(0,0,0,0.9)] border border-white/10 transition-all duration-500 hover:scale-[1.02]">
+    </div>
 
-      <!-- Image Section -->
-      <div class="flex-1 bg-black/60 flex items-center justify-center p-4 sm:p-8 relative min-h-[50vh] lg:min-h-0">
-        <img id="bubbleRevealImg" src="" alt="Manifestation"
-          class="max-w-full max-h-full object-contain rounded-xl shadow-2xl transition-transform duration-500">
+    <!-- Floating Glass Info Panel -->
+    <div class="glass-reveal-panel w-full max-w-2xl p-6 sm:p-8 flex flex-col gap-6 shadow-2xl mb-24 sm:mb-0" onclick="event.stopPropagation()">
+      <div id="metaInspector" class="grid grid-cols-2 gap-6 text-xs">
+         <div class="flex flex-col"><span class="opacity-40 uppercase font-black text-[9px] tracking-[0.2em] mb-1">Casting Engine</span><span class="font-bold text-sm tracking-tight" id="metaModel">-</span></div>
+         <div class="flex flex-col items-end"><span class="opacity-40 uppercase font-black text-[9px] tracking-[0.2em] mb-1">Celestial Realm</span><span class="font-bold text-[var(--accent)] text-sm uppercase tracking-wide" id="metaRealm">-</span></div>
+         <div class="col-span-2 pt-4 border-t border-white/5">
+            <span class="opacity-40 uppercase font-black text-[9px] tracking-[0.2em] mb-2 block">Inscription</span>
+            <p id="metaPrompt" class="text-sm leading-relaxed opacity-90 font-medium italic tracking-tight">-</p>
+         </div>
       </div>
 
-      <!-- Sidebar Section -->
-      <div
-        class="w-full lg:w-[380px] bg-[var(--panel-bg)] backdrop-blur-3xl border-l border-[var(--panel-border)] p-6 lg:p-8 flex flex-col gap-8 overflow-y-auto">
-        <!-- Thumbnails -->
-        <div id="thumbsSection" class="hidden">
-          <h3 class="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">Variations</h3>
-          <div id="bubbleRevealThumbs" class="grid grid-cols-4 gap-2"></div>
-        </div>
-
-        <!-- Metadata -->
-        <div id="metaInspector" class="hidden flex-col gap-4 text-[13px] border-y border-[var(--panel-border)] py-6">
-          <div class="flex justify-between items-center"><span
-              class="opacity-60 text-[10px] font-bold uppercase tracking-widest">Realm</span><span
-              class="font-bold text-[var(--accent)] uppercase" id="metaRealm">-</span></div>
-          <div class="flex justify-between items-center"><span
-              class="opacity-60 text-[10px] font-bold uppercase tracking-widest">Model</span><span class="font-bold"
-              id="metaModel">-</span></div>
-          <div class="flex justify-between items-center"><span
-              class="opacity-60 text-[10px] font-bold uppercase tracking-widest">Seed</span><span
-              class="font-bold font-mono text-[var(--text-muted)]" id="metaSeed">-</span></div>
-          <div class="flex flex-col gap-2 mt-2">
-            <span class="opacity-60 text-[10px] font-bold uppercase tracking-widest">Prompt</span>
-            <div
-              class="p-4 bg-black/5 rounded-xl text-sm leading-relaxed max-h-40 overflow-y-auto shadow-inner border border-[var(--panel-border)]"
-              id="metaPrompt">-</div>
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="flex flex-col gap-3 mt-auto shrink-0 pt-4">
-          <a id="bubbleRevealDownload" href="#" download
-            class="btn-magic block w-full text-center py-4 rounded-xl text-[11px] font-bold uppercase tracking-widest shadow-lg">Save
-            Image</a>
-          <button id="resumeFromModal" onclick="resumeSelectedJob()"
-            class="w-full py-4 rounded-xl border-2 border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest content-center"
-            style="display:none;">Resume Job</button>
-          <button id="cloneBtn" onclick="cloneActiveManifestation()"
-            class="w-full py-4 rounded-xl border-2 border-[var(--panel-border)] hover:border-[var(--accent)] hover:bg-black/5 text-[11px] font-bold uppercase tracking-widest content-center transition-colors">Invoke
-            Again</button>
-        </div>
+      <div class="grid grid-cols-3 gap-4">
+        <a id="bubbleRevealDownload" href="#" download class="btn-magic h-14 flex items-center justify-center rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] shadow-2xl">Collect</a>
+        <button onclick="cloneActiveManifestation()" class="h-14 rounded-2xl border-2 border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-all text-[11px] font-black uppercase tracking-[0.15em]">Invoke</button>
+        <button onclick="closeBubbleReveal()" class="h-14 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-[11px] font-black uppercase tracking-[0.15em]">Close</button>
       </div>
     </div>
   </div>
@@ -579,32 +535,15 @@
 
     <section id="view-tasks" class="view hidden px-4 sm:px-8">
       <div class="max-w-7xl mx-auto glass-panel p-6 sm:p-10 min-h-[400px]">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-8">
-          <div>
-            <h2 class="text-3xl sm:text-4xl font-bold cinematic-text">Active Journeys</h2>
-            <p class="text-sm text-[var(--text-muted)] mt-2">Current requests and resume tokens live here while a job is
-              running.</p>
-          </div>
-          <button onclick="refreshCurrentJob()"
-            class="text-[10px] font-bold uppercase tracking-widest text-[var(--accent)]">Refresh</button>
-        </div>
         <div id="taskList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
       </div>
     </section>
 
     <section id="view-history" class="view hidden px-4 sm:px-8">
       <div class="max-w-7xl mx-auto glass-panel p-6 sm:p-10 min-h-[400px]">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-8">
-          <div>
-            <h2 class="text-3xl sm:text-4xl font-bold cinematic-text">The Vault</h2>
-            <p class="text-sm text-[var(--text-muted)] mt-2">Loads from Neon and R2, 20 records at a time.</p>
-          </div>
-          <div class="flex items-center gap-3">
-            <button onclick="reloadHistory()"
-              class="text-[10px] font-bold uppercase tracking-widest text-[var(--accent)]">Reload</button>
-            <button onclick="clearVault()" class="text-[10px] font-bold uppercase text-red-500 hover:opacity-70">Clear
-              Local Cache</button>
-          </div>
+        <div class="flex items-center justify-end gap-3 mb-6">
+           <button onclick="reloadHistory()" class="text-[10px] font-bold uppercase tracking-widest text-[var(--accent)]">Reload</button>
+           <button onclick="clearVault()" class="text-[10px] font-bold uppercase text-red-500 hover:opacity-70">Clear Cache</button>
         </div>
         <div id="historyList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
         <div class="mt-8 flex justify-center">
@@ -616,16 +555,7 @@
   </main>
 
   <div id="desktopConsole" class="bottom-console glass-panel p-4 border-2 border-[var(--accent)]">
-    <!-- The Divine Hand -->
-    <div class="divine-hand">
-      <svg viewBox="0 0 200 200" fill="var(--accent)" xmlns="http://www.w3.org/2000/svg">
-        <path d="M100 20C80 20 60 40 60 70V120C60 130 65 140 70 145V170C70 180 80 190 100 190C120 190 130 180 130 170V145C135 140 140 130 140 120V70C140 40 120 20 100 20Z" opacity="0.3"/>
-        <path d="M100 40c-15 0-30 15-30 40v30c0 10 5 20 10 25v25c0 10 10 15 20 15s20-5 20-15v-25c5-5 10-15 10-25V80c0-25-15-40-30-40z" fill="white" opacity="0.8"/>
-        <circle cx="100" cy="80" r="15" fill="var(--accent)"/>
-      </svg>
-    </div>
-    
-    <button onclick="toggleConsole()"
+    <button onclick="toggleConsole()" id="consoleToggleBtn"
       class="absolute -top-10 left-1/2 -translate-x-1/2 bg-[var(--accent)] text-white px-6 py-2 rounded-t-xl font-bold text-[10px] uppercase tracking-widest shadow-lg">
       <span id="consoleToggleText">Minimize</span>
     </button>
@@ -717,6 +647,12 @@
 
   <!-- Mobile Nav -->
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-[200] glass-panel p-4 rounded-b-none border-t border-[var(--panel-border)] flex items-center justify-around shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+    <!-- Pinned Toggle Button for Mobile -->
+    <div id="mobileToggleStub" style="display: none; position: absolute; top: -42px; left: 50%; transform: translateX(-50%); z-index: 1001;">
+       <button onclick="toggleConsole()" class="bg-[var(--accent)] text-white px-8 py-2.5 rounded-t-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-2xl">
+         Expand
+       </button>
+    </div>
     <button data-view="generate" class="mobile-nav-item flex flex-col items-center p-2 transition-all opacity-60 active">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -1476,6 +1412,7 @@
     function pastePrompt() { navigator.clipboard.readText().then(text => dom.prompt.value = text); }
     function toggleConsole(forceState) {
       const el = document.getElementById("desktopConsole");
+      const stub = document.getElementById("mobileToggleStub");
       let isMin = el.classList.contains("minimized");
       if (forceState === "expand") isMin = false;
       else if (forceState === "minimize") isMin = true;
@@ -1483,6 +1420,13 @@
 
       el.classList.toggle("minimized", isMin);
       document.getElementById("consoleToggleText").textContent = isMin ? "Expand" : "Minimize";
+      if (stub) stub.style.display = isMin ? "block" : "none";
+    }
+    function reloadHistory() {
+      state.historyLoaded = false;
+      state.historyPage = 0;
+      dom.historyList.innerHTML = "";
+      renderHistory();
     }
     async function copyRequestId(id) { if (id) { await navigator.clipboard.writeText(id); setFooterMsg("Copied ID.", "info"); } }
     function escapeHtml(v) { return String(v).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
