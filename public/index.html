@@ -340,14 +340,47 @@
       width: calc(100% - 1.5rem);
       max-width: 1100px;
       z-index: 100;
-      transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.25s ease;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
       will-change: transform, opacity;
     }
 
     .bottom-console.minimized {
-      transform: translate(-50%, calc(100% - 3.5rem));
+      transform: translate(-50%, calc(100% - 1.5rem));
       opacity: 0.94;
     }
+
+    /* Tablet and larger sizing */
+    @media (min-width: 1024px) {
+      .bottom-console.minimized {
+         transform: translate(-50%, calc(100% - 3.5rem));
+      }
+    }
+
+    .divine-hand {
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px) rotate(180deg);
+      width: 100px;
+      height: 100px;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.5s ease;
+      filter: drop-shadow(0 0 15px var(--accent));
+      z-index: -1;
+    }
+
+    .bottom-console.minimized .divine-hand {
+      opacity: 0.4;
+      transform: translateX(-50%) translateY(0) rotate(180deg);
+      animation: beckon 3s infinite ease-in-out;
+    }
+
+    @keyframes beckon {
+      0%, 100% { transform: translateX(-50%) translateY(0) rotate(180deg); }
+      50% { transform: translateX(-50%) translateY(-10px) rotate(180deg); }
+    }
+
 
     /* Progress Matrix */
     .progress-matrix {
@@ -583,6 +616,15 @@
   </main>
 
   <div id="desktopConsole" class="bottom-console glass-panel p-4 border-2 border-[var(--accent)]">
+    <!-- The Divine Hand -->
+    <div class="divine-hand">
+      <svg viewBox="0 0 200 200" fill="var(--accent)" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100 20C80 20 60 40 60 70V120C60 130 65 140 70 145V170C70 180 80 190 100 190C120 190 130 180 130 170V145C135 140 140 130 140 120V70C140 40 120 20 100 20Z" opacity="0.3"/>
+        <path d="M100 40c-15 0-30 15-30 40v30c0 10 5 20 10 25v25c0 10 10 15 20 15s20-5 20-15v-25c5-5 10-15 10-25V80c0-25-15-40-30-40z" fill="white" opacity="0.8"/>
+        <circle cx="100" cy="80" r="15" fill="var(--accent)"/>
+      </svg>
+    </div>
+    
     <button onclick="toggleConsole()"
       class="absolute -top-10 left-1/2 -translate-x-1/2 bg-[var(--accent)] text-white px-6 py-2 rounded-t-xl font-bold text-[10px] uppercase tracking-widest shadow-lg">
       <span id="consoleToggleText">Minimize</span>
@@ -1430,6 +1472,7 @@
     initAetherCanvas();
 
     function clearVault() { if (confirm("Clear local cache?")) { localStorage.removeItem("a_vault_cache"); dom.historyList.innerHTML = ""; reloadHistory(); } }
+    function clearPrompt() { dom.prompt.value = ""; dom.negativePrompt.value = ""; setFooterMsg("Vision cleared.", "info"); }
     function pastePrompt() { navigator.clipboard.readText().then(text => dom.prompt.value = text); }
     function toggleConsole(forceState) {
       const el = document.getElementById("desktopConsole");
