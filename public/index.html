@@ -257,67 +257,48 @@
       border-color: var(--accent);
     }
 
-    .bubble-image-reveal {
+    /* Modern Lightbox Redesign */
+    #bubbleReveal {
       position: fixed;
       inset: 0;
-      z-index: 200;
+      z-index: 9999;
+      transition: opacity 0.4s ease, backdrop-filter 0.4s ease;
       display: none;
-      background: rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(12px);
       opacity: 0;
-      transition: opacity 0.35s ease;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
       padding: 1rem;
     }
 
-    .bubble-image-reveal.active {
-      display: block;
+    
+    #bubbleReveal.active {
+      display: flex !important;
       opacity: 1;
     }
 
-    .reveal-content {
-      width: 100%;
-      height: 100%;
-      max-width: 1600px;
-      margin: 0 auto;
-      background: var(--bg-base);
-      border-radius: 1.5rem;
-      border: 1px solid var(--panel-border);
-      overflow: hidden;
-      position: relative;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
-      transform: scale(0.96) translateY(20px);
-      transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-      display: flex;
-      flex-direction: column;
+    .glass-reveal-panel {
+      background: rgba(15, 15, 15, 0.75);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      transform: translateY(30px);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #bubbleReveal.active .glass-reveal-panel {
+      transform: translateY(0);
     }
 
-    .bubble-image-reveal.active .reveal-content {
-      transform: scale(1) translateY(0);
+    #bubbleReveal.active img {
+       transform: scale(1);
+    }
+    #bubbleReveal img {
+       transform: scale(0.95);
+       transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .reveal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.5);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      font-size: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .reveal-close:hover {
-      background: var(--accent);
-      transform: scale(1.1);
-    }
 
     .status-pill {
       display: inline-flex;
@@ -1191,7 +1172,6 @@
       panel.classList.remove("hidden");
       document.getElementById("metaRealm").textContent = data.realm || "day";
       document.getElementById("metaModel").textContent = data.model || "Standard";
-      document.getElementById("metaSeed").textContent = data.seed || "Random";
       document.getElementById("metaPrompt").textContent = data.prompt;
       state.__inspected_data = data;
     }
@@ -1215,8 +1195,6 @@
         document.getElementById("bubbleRevealImg").src = url;
         document.getElementById("bubbleRevealDownload").href = url;
         populateInspector(data);
-        document.getElementById("thumbsSection").classList.add("hidden");
-        document.getElementById("resumeFromModal").style.display = state.activeRequestId ? "block" : "none";
         reveal.style.display = "block";
         setTimeout(() => reveal.classList.add("active"), 10);
       }, 150);
@@ -1249,22 +1227,9 @@
       if (!urls.length) return;
       const reveal = document.getElementById("bubbleReveal");
       const img = document.getElementById("bubbleRevealImg");
-      const thumbs = document.getElementById("bubbleRevealThumbs");
       img.src = urls[0];
       document.getElementById("bubbleRevealDownload").href = urls[0];
       populateInspector(entry);
-
-      const thumbsSection = document.getElementById("thumbsSection");
-      if (urls.length > 1) {
-        thumbsSection.classList.remove("hidden");
-        thumbs.innerHTML = urls.map((url, idx) => `<button class="art-frame overflow-hidden border-2 border-[var(--panel-border)] hover:border-[var(--accent)] transition-colors" onclick="event.stopPropagation(); document.getElementById('bubbleRevealImg').src='${url}'; document.getElementById('bubbleRevealDownload').href='${url}';"><img src="${url}" class="w-full aspect-square object-cover" loading="lazy"></button>`).join("");
-      } else {
-        thumbsSection.classList.add("hidden");
-      }
-
-      const resumeBtn = document.getElementById("resumeFromModal");
-      resumeBtn.style.display = entry.request_id ? "block" : "none";
-      resumeBtn.onclick = () => { if (entry.request_id) { resumeRequest(entry.request_id); closeBubbleReveal(); } };
 
       reveal.style.display = "block";
       setTimeout(() => reveal.classList.add("active"), 10);
