@@ -626,8 +626,18 @@
           state.activeRequest = res;
           updateTasksView(res);
           
-          if (res.status === "done" && res.result?.image_urls?.length) {
-            handleSuccess(res.result.image_urls, requestId, payload, res);
+          // Streaming images as they appear in the DB
+          if (res.images && res.images.length > 0) {
+            const urls = res.images.map(img => img.r2_url);
+            // Only re-render if count changed or it was empty
+            if (urls.length > (dom.gallery.querySelectorAll(".bubble").length)) {
+              renderGallery(urls, requestId, payload, res);
+            }
+          }
+
+          if (res.status === "done" && (res.result?.image_urls?.length || res.images?.length)) {
+            const finalUrls = res.images?.length ? res.images.map(img => img.r2_url) : res.result.image_urls;
+            handleSuccess(finalUrls, requestId, payload, res);
             setFooterMsg("Vision completed.", "info");
             return true;
           }
@@ -724,6 +734,24 @@
     function handleSuccess(urls, requestId, payload, meta = {}) {
       saveActiveRequest(requestId);
       state.activeRequest = meta || state.activeRequest;
+      renderGallery(urls, requestId, payload, meta);
+
+      updateTasksView({
+        request_id: requestId,
+        realm: payload?.realm || (payload?.nsfw ? "star" : "day"),
+        status: "done",
+        prompt: payload?.prompt,
+        model: payload?.model,
+        quality: payload?.quality,
+        aspect: payload?.aspect,
+        created_at: meta?.created_at || new Date().toISOString(),
+      });
+      setFooterMsg("Vault updated.", "info");
+      state.historyLoaded = false;
+      renderHistory(); 
+    }
+
+    function renderGallery(urls, requestId, payload, meta = {}) {
       const cards = urls.map((url, idx) => {
         const vaulted = (url.includes(".r2.dev") || url.includes("cloudflare")) ? '<span class="vault-badge">Vaulted</span>' : '';
         return `
@@ -742,20 +770,6 @@
         const bubble = document.getElementById(`bubble-${requestId}-${idx}`);
         if (bubble) bubble.onclick = () => popBubble(bubble, url);
       });
-
-      updateTasksView({
-        request_id: requestId,
-        realm: payload?.realm || (payload?.nsfw ? "star" : "day"),
-        status: "done",
-        prompt: payload?.prompt,
-        model: payload?.model,
-        quality: payload?.quality,
-        aspect: payload?.aspect,
-        created_at: meta?.created_at || new Date().toISOString(),
-      });
-      setFooterMsg("Vault updated.", "info");
-      state.historyLoaded = false;
-      renderHistory(); // This will only execute if the history view is actually visible
     }
 
     function popBubble(el, url) {
@@ -832,6 +846,36 @@
       setTimeout(() => reveal.classList.add("active"), 10);
     }
 
+    function appendHistoryItems(items, clear = false) {
+      if (clear) dom.historyList.innerHTML = "";
+      items.forEach(entry => {
+        const wrap = document.createElement("div");
+        wrap.className = "glass-panel p-3 cursor-pointer";
+        wrap.addEventListener("click", (e) => {
+          if (e.target.closest("button")) return;
+          openHistoryGroup(entry);
+        });
+        wrap.innerHTML = `
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div class="min-w-0">
+              <div class="text-[9px] uppercase tracking-widest text-[var(--text-muted)]">${entry.realm || "day"} · ${entry.status || "done"}</div>
+              <div class="text-xs font-bold truncate">${escapeHtml(entry.prompt || "")}</div>
+            </div>
+            <button class="text-[9px] font-bold uppercase text-[var(--accent)]" data-request="${entry.request_id}">Resume</button>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            ${(entry.images || []).map(img => `
+              <div class="art-frame pointer-events-none">
+                <img src="${img.r2_url}" class="w-full aspect-square object-cover" loading="lazy" alt="Vault image">
+              </div>
+            `).join("")}
+          </div>
+        `;
+        wrap.querySelector("[data-request]")?.addEventListener("click", () => resumeRequest(entry.request_id));
+        dom.historyList.appendChild(wrap);
+      });
+    }
+
     async function loadHistoryPage() {
       if (state.loadingHistory || !state.historyHasMore) return;
       state.loadingHistory = true;
@@ -841,36 +885,12 @@
         const res = await apiFetch(`/history?page=${state.historyPage}&limit=${state.historyLimit}`, { method: "GET", headers: {} });
         const items = res.items || [];
         if (state.historyPage === 1) {
-          dom.historyList.innerHTML = "";
           state.historyLoaded = true;
+          appendHistoryItems(items, true);
+          localStorage.setItem("a_vault_cache", JSON.stringify(items));
+        } else {
+          appendHistoryItems(items, false);
         }
-
-        items.forEach(entry => {
-          const wrap = document.createElement("div");
-          wrap.className = "glass-panel p-3 cursor-pointer";
-          wrap.addEventListener("click", (e) => {
-            if (e.target.closest("button")) return;
-            openHistoryGroup(entry);
-          });
-          wrap.innerHTML = `
-            <div class="flex items-center justify-between gap-2 mb-3">
-              <div class="min-w-0">
-                <div class="text-[9px] uppercase tracking-widest text-[var(--text-muted)]">${entry.realm || "day"} · ${entry.status || "done"}</div>
-                <div class="text-xs font-bold truncate">${escapeHtml(entry.prompt || "")}</div>
-              </div>
-              <button class="text-[9px] font-bold uppercase text-[var(--accent)]" data-request="${entry.request_id}">Resume</button>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-              ${(entry.images || []).map(img => `
-                <div class="art-frame pointer-events-none">
-                  <img src="${img.r2_url}" class="w-full aspect-square object-cover" loading="lazy" alt="Vault image">
-                </div>
-              `).join("")}
-            </div>
-          `;
-          wrap.querySelector("[data-request]")?.addEventListener("click", () => resumeRequest(entry.request_id));
-          dom.historyList.appendChild(wrap);
-        });
 
         state.historyHasMore = !!res.has_more;
         state.historyPage += 1;
@@ -888,11 +908,18 @@
       if (!dom.historyList) return;
       if (document.getElementById("view-history").classList.contains("hidden")) return;
       
+      // Load from cache first if empty
+      if (dom.historyList.innerHTML === "" && localStorage.getItem("a_vault_cache")) {
+        try {
+          const cached = JSON.parse(localStorage.getItem("a_vault_cache"));
+          appendHistoryItems(cached, true);
+        } catch(e) { console.warn("Cache load failed", e); }
+      }
+
       if (state.historyLoaded && !reset) return;
 
       state.historyPage = 1;
       state.historyHasMore = true;
-      if (reset) dom.historyList.innerHTML = "";
       await loadHistoryPage();
     }
 
