@@ -139,19 +139,19 @@
     }
 
     main {
-      height: 100vh;
+      padding-top: 8rem;
+      padding-bottom: 22rem;
       overflow-y: auto;
-      scroll-behavior: smooth;
-      padding-top: 5rem;
-      padding-bottom: 25rem;
+      height: 100vh;
+      scrollbar-width: none;
     }
 
     @media (max-width: 768px) {
       html { font-size: 14px; }
       h2.cinematic-text { font-size: 1.75rem !important; }
-      main { padding-top: 5rem; padding-bottom: 38rem; }
+      main { padding-top: 7.5rem; padding-bottom: 38rem; }
       .bottom-console { bottom: 5rem !important; }
-      .view { padding-top: 2rem; }
+      .view { padding-top: 1rem; }
     }
 
     .mobile-nav-item svg {
@@ -518,13 +518,13 @@
       </div>
     </section>
 
-    <section id="view-tasks" class="view hidden px-4 sm:px-8 mt-16 sm:mt-12">
+    <section id="view-tasks" class="view hidden px-4 sm:px-8">
       <div class="max-w-7xl mx-auto glass-panel p-6 sm:p-10 min-h-[400px]">
         <div id="taskList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
       </div>
     </section>
 
-    <section id="view-history" class="view hidden px-4 sm:px-8 mt-16 sm:mt-12">
+    <section id="view-history" class="view hidden px-4 sm:px-8">
       <div class="max-w-7xl mx-auto glass-panel p-6 sm:p-10 min-h-[400px]">
         <div class="flex items-center justify-end gap-3 mb-6">
            <button onclick="reloadHistory()" class="text-[10px] font-bold uppercase tracking-widest text-[var(--accent)]">Reload</button>
