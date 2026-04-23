@@ -2,504 +2,1439 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PromptStore | Aether Studio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aether Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
-        :root {
-            --bg-base: #f0f7f4;
-            --blob-1: #a7f3d0;
-            --blob-2: #fde68a;
-            --blob-3: #99f6e4;
-            --panel-bg: rgba(255, 255, 255, 0.45);
-            --panel-border: rgba(255, 255, 255, 0.7);
-            --panel-shadow: rgba(0, 50, 20, 0.1);
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --accent: #10b981;
-            --accent-hover: #059669;
-            --accent-glow: rgba(16, 185, 129, 0.4);
-            --accent-text: #ffffff;
-        }
+    :root {
+      --bg-base: #f1f7f4;
+      --panel-bg: rgba(255, 255, 255, 0.5);
+      --panel-border: rgba(255, 255, 255, 0.7);
+      --panel-shadow: rgba(0, 50, 20, 0.1);
+      --text-main: #10243a;
+      --text-muted: #64748b;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --accent-glow: rgba(16, 185, 129, 0.4);
+      --accent-text: #fff;
+    }
 
-        body[data-mode="nsfw"] {
-            --bg-base: #0f172a;
-            --blob-1: #8b5cf6;
-            --blob-2: #3b82f6;
-            --blob-3: #ec4899;
-            --panel-bg: rgba(15, 23, 42, 0.6);
-            --panel-border: rgba(255, 255, 255, 0.1);
-            --panel-shadow: rgba(0, 0, 0, 0.5);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #8b5cf6;
-            --accent-hover: #7c3aed;
-            --accent-glow: rgba(139, 92, 246, 0.5);
-            --accent-text: #ffffff;
-        }
+    body[data-mode="nsfw"] {
+      --bg-base: #0f172a;
+      --panel-bg: rgba(15, 23, 42, 0.62);
+      --panel-border: rgba(255, 255, 255, 0.12);
+      --panel-shadow: rgba(0, 0, 0, 0.5);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #8b5cf6;
+      --accent-hover: #7c3aed;
+      --accent-glow: rgba(139, 92, 246, 0.5);
+      --accent-text: #fff;
+    }
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            transition: background-color 1.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s ease;
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
-        }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(16, 185, 129, 0.12), transparent 30%),
+        linear-gradient(180deg, var(--bg-base), var(--bg-base));
+      color: var(--text-main);
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      transition: background-color 0.6s ease, color 0.3s ease;
+    }
 
-        h1, h2, h3, .cinematic-text { font-family: 'Cinzel', serif; }
+    h1,
+    h2,
+    h3,
+    .cinematic-text {
+      font-family: 'Cinzel', serif;
+    }
 
-        .glass-panel {
-            background: var(--panel-bg);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--panel-border);
-            box-shadow: 0 20px 40px var(--panel-shadow);
-            border-radius: 2rem;
-        }
+    .glass-panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--panel-border);
+      box-shadow: 0 20px 40px var(--panel-shadow);
+      border-radius: 2rem;
+    }
 
-        .nav-pill {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            color: var(--text-muted);
-            cursor: pointer;
-        }
+    .nav-pill {
+      transition: all 0.25s ease;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
 
-        .nav-pill.active {
-            color: var(--accent-text);
-            background: var(--accent);
-            box-shadow: 0 8px 20px var(--accent-glow);
-        }
+    .nav-pill.active {
+      color: var(--accent-text);
+      background: var(--accent);
+      box-shadow: 0 10px 25px var(--accent-glow);
+    }
 
-        textarea, select, input {
-            background: var(--panel-bg) !important;
-            border: 2px solid var(--panel-border) !important;
-            color: var(--text-main) !important;
-            border-radius: 1rem !important;
-            transition: all 0.3s ease !important;
-        }
+    textarea,
+    select,
+    input {
+      background: var(--panel-bg) !important;
+      border: 1px solid var(--panel-border) !important;
+      color: var(--text-main) !important;
+      border-radius: 1rem !important;
+      transition: all 0.2s ease !important;
+    }
 
-        .btn-magic {
-            background: var(--accent);
-            color: var(--accent-text);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border-radius: 1.25rem;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
+    textarea:focus,
+    select:focus,
+    input:focus {
+      outline: none !important;
+      box-shadow: 0 0 0 3px var(--accent-glow) !important;
+      border-color: var(--accent) !important;
+    }
 
-        .btn-magic:hover:not(:disabled) {
-            background: var(--accent-hover);
-            box-shadow: 0 15px 35px var(--accent-glow);
-            transform: translateY(-4px) scale(1.02);
-        }
+    .btn-magic {
+      background: var(--accent);
+      color: var(--accent-text);
+      transition: all 0.25s ease;
+      border-radius: 1.25rem;
+      cursor: pointer;
+    }
 
-        .bottom-console {
-            position: fixed;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 95%;
-            max-width: 1100px;
-            z-index: 50;
-            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-        }
+    .btn-magic:hover:not(:disabled) {
+      background: var(--accent-hover);
+      box-shadow: 0 14px 32px var(--accent-glow);
+      transform: translateY(-2px);
+    }
 
-        .bottom-console.minimized { transform: translate(-50%, calc(100% - 3.5rem)); opacity: 0.9; }
+    .btn-magic:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
 
-        main {
-            height: 100vh;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-            padding-top: 8rem;
-            padding-bottom: 20rem;
-        }
+    .loader {
+      width: 18px;
+      height: 18px;
+      border: 2px solid white;
+      border-top-color: transparent;
+      border-radius: 999px;
+      animation: spin 1s linear infinite;
+    }
 
-        .bubble-container { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 5rem; padding: 2rem; }
-        .bubble { width: 240px; height: 240px; border-radius: 50%; position: relative; cursor: pointer; animation: bubbleFloat 4s ease-in-out infinite alternate; }
-        @keyframes bubbleFloat { from { transform: translateY(0px); } to { transform: translateY(-20px); } }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
-        .bubble-img-overlay { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; opacity: 1; z-index: 1; }
-        .bubble-img-overlay img { width: 100%; height: 100%; object-fit: cover; }
-        .bubble-sphere { width: 100%; height: 100%; border-radius: 50%; position: absolute; inset: 0; z-index: 2; background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.4) 0%, transparent 60%); box-shadow: inset -10px -10px 30px rgba(0,0,0,0.1), 0 10px 30px var(--accent-glow); }
+    @keyframes float {
+      from {
+        transform: translateY(0px);
+      }
 
-        .loader { width: 20px; height: 20px; border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 1s infinite linear; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+      to {
+        transform: translateY(-14px);
+      }
+    }
 
-        .ambient-bg { position: fixed; inset: -20%; z-index: -1; overflow: hidden; pointer-events: none; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.6; animation: float 25s infinite ease-in-out alternate; }
-        .blob-1 { top: 10%; left: 10%; width: 45vw; height: 45vw; background: var(--blob-1); }
-        .blob-2 { bottom: 10%; right: 10%; width: 55vw; height: 55vw; background: var(--blob-2); }
-        main::-webkit-scrollbar { width: 0px; background: transparent; }
+    main {
+      padding-top: 8rem;
+      padding-bottom: 22rem;
+      overflow-y: auto;
+      height: 100vh;
+      scrollbar-width: none;
+    }
 
-        .art-frame { border-radius: 1.5rem; overflow: hidden; position: relative; transition: all 0.5s ease; border: 4px solid var(--panel-bg); background: var(--panel-bg); cursor: pointer; }
-        .art-frame:hover { transform: translateY(-8px); border-color: var(--accent); }
-    </style>
+    @media (max-width: 768px) {
+      html { font-size: 14px; }
+      h2.cinematic-text { font-size: 1.75rem !important; }
+      main { padding-top: 7.5rem; padding-bottom: 38rem; }
+      .bottom-console { bottom: 5rem !important; }
+      .view { padding-top: 1rem; }
+    }
+
+    .mobile-nav-item svg {
+      width: 20px;
+      height: 20px;
+      margin-bottom: 4px;
+    }
+
+    .mobile-nav-item.active {
+      color: var(--accent);
+    }
+
+
+    main::-webkit-scrollbar {
+      width: 0;
+    }
+
+    .bubble-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      padding: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .bubble {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      position: relative;
+      cursor: pointer;
+      animation: float 4s infinite alternate ease-in-out;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .bubble-img-overlay {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .bubble-img-overlay img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .bubble-sphere {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.42) 0%, transparent 60%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .bubble-canvas {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      border-radius: 50%;
+      z-index: 50;
+      width: 260px;
+      height: 260px;
+    }
+
+    .vault-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--accent);
+      color: white;
+      font-size: 8px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      z-index: 10;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 10px var(--accent-glow);
+    }
+
+    .art-frame {
+      border-radius: 1.25rem;
+      overflow: hidden;
+      position: relative;
+      transition: all 0.3s ease;
+      background: var(--panel-bg);
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .art-frame:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+
+    /* Modern Lightbox Redesign */
+    #bubbleReveal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      transition: opacity 0.4s ease, backdrop-filter 0.4s ease;
+      display: none;
+      opacity: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 1rem;
+    }
+
+    
+    #bubbleReveal.active {
+      display: flex !important;
+      opacity: 1;
+    }
+
+    .glass-reveal-panel {
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 28px;
+      transform: translateY(30px);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    #bubbleReveal.active .glass-reveal-panel {
+      transform: translateY(0);
+    }
+
+    #bubbleReveal.active img {
+       transform: scale(1);
+    }
+    #bubbleReveal img {
+       transform: scale(0.95);
+       transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .bottom-console {
+      position: fixed;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 1.5rem);
+      max-width: 1100px;
+      z-index: 100;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+      will-change: transform, opacity;
+    }
+
+    .bottom-console.minimized {
+      transform: translate(-50%, calc(100%));
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #mobileToggleStub {
+       display: none;
+       position: absolute;
+       top: -38px;
+       left: 50%;
+       transform: translateX(-50%);
+       z-index: 1001;
+    }
+
+
+    @media (max-width: 768px) {
+      .bottom-console.minimized + .mobile-nav .console-toggle-btn-overlay {
+         display: block;
+      }
+    }
+
+
+    /* Progress Matrix */
+    .progress-matrix {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin-top: 1rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .progress-matrix.active {
+      opacity: 1;
+    }
+
+    .progress-step {
+      height: 4px;
+      background: var(--panel-border);
+      border-radius: 999px;
+      position: relative;
+    }
+
+    .progress-step.done {
+      background: var(--accent);
+    }
+
+    .progress-step.active::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      border-radius: 999px;
+      animation: pulse-width 1.5s infinite;
+    }
+
+    @keyframes pulse-width {
+      0% {
+        width: 0%;
+        opacity: 0.5;
+      }
+
+      100% {
+        width: 100%;
+        opacity: 0;
+      }
+    }
+
+    .progress-label {
+      font-size: 8px;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-top: 4px;
+      color: var(--text-muted);
+    }
+
+    .progress-step.done+.progress-label {
+      color: var(--accent);
+    }
+
+    /* Removed old meta-inspector css since it is explicitly rewritten using tailwind */
+  </style>
 </head>
 
 <body data-mode="standard">
-    <div class="ambient-bg">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
+  <canvas id="aetherCanvas" class="fixed inset-0 pointer-events-none z-[-1]"></canvas>
+
+  <header class="fixed top-5 left-0 right-0 z-[110] px-4 sm:px-8">
+    <div
+      class="max-w-7xl mx-auto glass-panel p-4 border-t-4 border-t-[var(--accent)] flex items-center justify-between gap-4 shadow-2xl">
+      <div class="flex items-center gap-4 min-w-0">
+        <div
+          class="w-10 h-10 rounded-xl bg-[var(--accent)] text-white flex items-center justify-center shadow-lg transform -rotate-3 shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5">
+            <path
+              d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-2xl sm:text-3xl font-black cinematic-text tracking-[0.3em] truncate text-[var(--accent)]">AETHER WORLD</h1>
+        </div>
+      </div>
+
+      <nav class="hidden sm:flex items-center gap-2 bg-black/5 p-1 rounded-2xl shrink-0">
+        <button data-view="generate"
+          class="nav-pill active px-4 sm:px-5 py-2 rounded-xl font-bold uppercase text-[10px] tracking-widest">Forge</button>
+        <button data-view="tasks"
+          class="nav-pill px-4 sm:px-5 py-2 rounded-xl font-bold uppercase text-[10px] tracking-widest">Queue</button>
+        <button data-view="history"
+          class="nav-pill px-4 sm:px-5 py-2 rounded-xl font-bold uppercase text-[10px] tracking-widest">Vault</button>
+      </nav>
+
+      <div class="status-pill hidden sm:inline-flex" id="backendStatus">Checking backend...</div>
+    </div>
+  </header>
+
+  <div id="bubbleReveal" class="fixed inset-0 z-[2000] hidden flex-col items-center justify-start p-4 sm:p-12 bg-black/80 backdrop-blur-md overflow-y-auto" onclick="closeBubbleReveal(event)">
+    <!-- Floating Image -->
+    <div class="relative max-w-full flex items-center justify-center my-auto pt-8 pb-4" onclick="event.stopPropagation()">
+       <img id="bubbleRevealImg" src="" alt="Manifestation" class="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-[0_20px_80px_rgba(0,0,0,0.9)] border border-white/10 transition-all duration-500 hover:scale-[1.02]">
     </div>
 
-    <!-- Header -->
-    <header class="fixed top-6 left-0 right-0 z-[100] px-8">
-        <div class="max-w-7xl mx-auto glass-panel p-4 border-t-4 border-t-[var(--accent)] flex items-center justify-between shadow-2xl">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-lg bg-[var(--accent)] text-white flex items-center justify-center shadow-lg transform -rotate-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>
-                </div>
-                <h1 class="text-xl font-black cinematic-text tracking-widest hidden sm:block">AETHER</h1>
-            </div>
-            <nav class="flex items-center gap-2 bg-black/5 p-1 rounded-2xl mx-auto">
-                <button data-view="generate" class="nav-pill active px-5 py-2 rounded-xl font-bold uppercase text-[10px] tracking-widest">Forge</button>
-                <button data-view="tasks" class="nav-pill px-5 py-2 rounded-xl font-bold uppercase text-[10px] tracking-widest">Queue</button>
-                <button data-view="history" class="nav-pill px-5 py-2 rounded-xl font-bold uppercase text-[10px] tracking-widest">Vault</button>
-            </nav>
-            <div class="w-10 h-10 sm:hidden"></div>
-        </div>
-    </header>
+    <!-- Floating Glass Info Panel -->
+    <div class="glass-reveal-panel w-full max-w-2xl p-8 sm:p-10 flex flex-col gap-6 shadow-2xl mb-24 sm:mb-0" onclick="event.stopPropagation()">
+      <div id="metaInspector" class="grid grid-cols-2 gap-8">
+         <div class="flex flex-col"><span class="opacity-60 uppercase font-black text-[10px] tracking-[0.2em] mb-2 text-[var(--accent)]">Casting Engine</span><span class="font-bold text-lg tracking-tight" id="metaModel">-</span></div>
+         <div class="flex flex-col items-end"><span class="opacity-60 uppercase font-black text-[10px] tracking-[0.2em] mb-2 text-[var(--accent)]">Celestial Realm</span><span class="font-bold text-white text-lg uppercase tracking-wide" id="metaRealm">-</span></div>
+         <div class="col-span-2 pt-6 border-t border-white/10">
+            <span class="opacity-60 uppercase font-black text-[10px] tracking-[0.2em] mb-3 block text-[var(--accent)]">Inscription</span>
+            <p id="metaPrompt" class="text-base sm:text-lg leading-relaxed text-white font-medium italic tracking-tight">-</p>
+         </div>
+      </div>
 
-    <!-- Detail Modal -->
-    <div id="modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-2xl opacity-0 transition-opacity duration-500">
-        <div class="glass-panel max-w-6xl w-full max-h-[90vh] flex flex-col lg:flex-row overflow-hidden shadow-2xl scale-95 transition-transform duration-500" id="modalContainer">
-            <div class="flex-1 bg-black/10 flex items-center justify-center p-6">
-                <img id="modalImage" src="" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl" />
-            </div>
-            <div class="w-full lg:w-[400px] p-8 flex flex-col gap-6 bg-white/5 overflow-y-auto border-t lg:border-l border-white/10">
-                <h3 class="text-3xl font-bold cinematic-text">Manifestation</h3>
-                <div class="space-y-4">
-                    <div class="p-4 bg-[var(--panel-bg)] rounded-xl border border-[var(--panel-border)]">
-                        <p class="text-[10px] uppercase tracking-widest text-[var(--text-muted)] mb-1 font-bold">The Vision</p>
-                        <p id="modalPrompt" class="text-sm font-medium italic leading-relaxed"></p>
-                    </div>
-                </div>
-                <div class="mt-auto space-y-4 pb-8 lg:pb-0">
-                    <a id="downloadImageBtn" href="#" download class="block w-full py-4 btn-magic font-bold text-center uppercase tracking-widest shadow-xl">Save Image</a>
-                    <button onclick="closeModal()" class="w-full py-3 text-[var(--text-muted)] font-bold uppercase tracking-widest text-xs hover:text-[var(--text-main)] transition-colors">Close</button>
-                </div>
-            </div>
-        </div>
+      <div class="grid grid-cols-3 gap-4">
+        <a id="bubbleRevealDownload" href="#" download class="btn-magic h-14 flex items-center justify-center rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] shadow-2xl">Collect</a>
+        <button onclick="cloneActiveManifestation()" class="h-14 rounded-2xl border-2 border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-all text-[11px] font-black uppercase tracking-[0.15em]">Invoke</button>
+        <button onclick="closeBubbleReveal()" class="h-14 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-[11px] font-black uppercase tracking-[0.15em]">Close</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Content Area -->
-    <main id="mainContent">
-        <section id="view-generate" class="view">
-            <div id="gallery" class="bubble-container">
-                <div id="galleryEmpty" class="py-32 text-center opacity-10 text-3xl font-light cinematic-text tracking-[0.3em] uppercase">Void Awaiting Light</div>
+  <main id="mainContent">
+    <section id="view-generate" class="view">
+      <div class="max-w-7xl mx-auto px-4 sm:px-8">
+        <div class="hidden sm:block glass-panel p-4 sm:p-6 mb-6">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h2 class="text-3xl sm:text-4xl font-bold cinematic-text">Manifestations</h2>
+              <div class="progress-matrix" id="progressMatrix">
+                <div>
+                  <div class="progress-step" id="step-0"></div>
+                  <div class="progress-label">Link</div>
+                </div>
+                <div>
+                  <div class="progress-step" id="step-1"></div>
+                  <div class="progress-label">Auth</div>
+                </div>
+                <div>
+                  <div class="progress-step" id="step-2"></div>
+                  <div class="progress-label">Weave</div>
+                </div>
+                <div>
+                  <div class="progress-step" id="step-3"></div>
+                  <div class="progress-label">Vault</div>
+                </div>
+              </div>
             </div>
-        </section>
-
-        <section id="view-tasks" class="view hidden px-8">
-            <div class="max-w-7xl mx-auto glass-panel p-10 min-h-[400px]">
-                <h2 class="text-4xl font-bold cinematic-text mb-8">Active Journeys</h2>
-                <div id="taskList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div class="flex items-center gap-2">
+              <span id="activeRequestBadge" class="status-pill">No active request</span>
+              <button id="retryBtn" onclick="resumeLastRequest()"
+                class="btn-magic px-4 py-2 text-[10px] font-bold uppercase tracking-widest" disabled>Retry Last</button>
             </div>
-        </section>
-
-        <section id="view-history" class="view hidden px-8">
-            <div class="max-w-7xl mx-auto glass-panel p-10 min-h-[400px]">
-                <h2 class="text-4xl font-bold cinematic-text mb-8">The Vault</h2>
-                <div id="historyList" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
-            </div>
-        </section>
-    </main>
-
-    <!-- COMPACT 2-COLUMN CONSOLE -->
-    <div id="desktopConsole" class="bottom-console glass-panel p-4 border-2 border-[var(--accent)]">
-        <button onclick="toggleConsole()" class="absolute -top-10 left-1/2 -translate-x-1/2 bg-[var(--accent)] text-white px-6 py-2 rounded-t-xl font-bold text-[10px] uppercase tracking-widest shadow-lg">
-            <span id="consoleToggleText">Minimize</span>
-        </button>
-
-        <div class="grid grid-cols-12 gap-4 items-stretch">
-            <!-- Left: Config (4 cols) -->
-            <div class="col-span-12 lg:col-span-4 flex flex-col gap-3">
-                <div class="flex items-center gap-1 bg-black/5 p-1 rounded-xl h-9 shrink-0">
-                    <button data-mode="standard" class="nav-pill active w-1/2 h-full rounded-lg text-[9px] font-bold uppercase">Day</button>
-                    <button data-mode="nsfw" class="nav-pill w-1/2 h-full rounded-lg text-[9px] font-bold uppercase">Star</button>
-                </div>
-                <div class="space-y-1">
-                    <label class="text-[9px] font-bold uppercase text-[var(--text-muted)] ml-1 opacity-70 tracking-widest">Engine</label>
-                    <select id="model" class="w-full h-9 px-3 font-bold text-xs"></select>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-bold uppercase text-[var(--text-muted)] ml-1 opacity-70 tracking-widest">Fidelity</label>
-                        <select id="quality" class="w-full h-9 px-3 font-bold text-xs"></select>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-bold uppercase text-[var(--text-muted)] ml-1 opacity-70 tracking-widest">Canvas</label>
-                        <select id="aspect" class="w-full h-9 px-3 font-bold text-xs"></select>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-bold uppercase text-[var(--text-muted)] ml-1 opacity-70 tracking-widest">Spirits</label>
-                        <select id="count" class="w-full h-9 px-3 font-bold text-xs">
-                            <option value="1">1 Spirit</option>
-                            <option value="2">2 Spirits</option>
-                            <option value="3">3 Spirits</option>
-                            <option value="4" selected>4 Spirits</option>
-                        </select>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-bold uppercase text-[var(--text-muted)] ml-1 opacity-70 tracking-widest">Seed</label>
-                        <input id="seed" type="number" placeholder="Random" class="w-full h-9 px-3 font-bold text-xs">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right: Vision (8 cols) -->
-            <div class="col-span-12 lg:col-span-8 flex flex-col gap-3">
-                <div class="flex-1 flex flex-col space-y-1">
-                    <div class="flex justify-between items-center px-1">
-                        <label class="text-[9px] font-bold uppercase text-[var(--text-muted)] tracking-widest opacity-70">The Vision</label>
-                        <div class="flex gap-4">
-                            <button onclick="clearPrompt()" class="text-[9px] font-bold text-red-400 uppercase tracking-tighter">Clear</button>
-                            <button onclick="pastePrompt()" class="text-[9px] font-bold text-[var(--accent)] uppercase tracking-tighter">Paste</button>
-                        </div>
-                    </div>
-                    <textarea id="prompt" placeholder="Describe the unseen..." class="w-full flex-1 p-3 resize-none text-sm leading-relaxed min-h-[5rem]"></textarea>
-                </div>
-                <div class="grid grid-cols-5 gap-3 shrink-0">
-                    <div class="col-span-4">
-                        <textarea id="negativePrompt" placeholder="Wards (What to banish...)" class="w-full h-11 px-3 py-2 text-xs resize-none"></textarea>
-                    </div>
-                    <button id="generateBtn" class="col-span-1 btn-magic flex items-center justify-center gap-2 font-bold uppercase text-[10px] tracking-widest shadow-lg">
-                        <span id="btnText">Manifest</span>
-                        <div id="btnLoader" class="hidden"><div class="loader"></div></div>
-                    </button>
-                </div>
-            </div>
+          </div>
         </div>
+
+        <div id="gallery" class="bubble-container">
+          <div id="galleryEmpty"
+            class="col-span-full py-20 text-center opacity-15 text-3xl font-light cinematic-text tracking-[0.3em] uppercase">
+            Void Awaiting Light</div>
+        </div>
+
+        <!-- The Matrix Grid -->
+        <div id="matrixGallery" class="hidden grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 py-8"></div>
+      </div>
+    </section>
+
+    <section id="view-tasks" class="view hidden px-4 sm:px-8">
+      <div class="max-w-7xl mx-auto glass-panel p-6 sm:p-10 min-h-[400px]">
+        <div id="taskList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+      </div>
+    </section>
+
+    <section id="view-history" class="view hidden px-4 sm:px-8">
+      <div class="max-w-7xl mx-auto glass-panel p-6 sm:p-10 min-h-[400px]">
+        <div class="flex items-center justify-end gap-3 mb-6">
+           <button onclick="reloadHistory()" class="text-[10px] font-bold uppercase tracking-widest text-[var(--accent)]">Reload</button>
+           <button onclick="clearVault()" class="text-[10px] font-bold uppercase text-red-500 hover:opacity-70">Clear Cache</button>
+        </div>
+        <div id="historyList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
+        <div class="mt-8 flex justify-center">
+          <button id="loadMoreBtn" onclick="loadMoreHistory()"
+            class="btn-magic px-5 py-3 text-[10px] font-bold uppercase tracking-widest">Load More</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="desktopConsole" class="bottom-console glass-panel p-4 border-2 border-[var(--accent)]">
+    <button onclick="toggleConsole()" id="consoleToggleBtn"
+      class="absolute -top-10 left-1/2 -translate-x-1/2 bg-[var(--accent)] text-white px-6 py-2 rounded-t-xl font-bold text-[10px] uppercase tracking-widest shadow-lg">
+      <span id="consoleToggleText">Minimize</span>
+    </button>
+
+    <div class="grid grid-cols-12 gap-4 items-stretch">
+      <div class="col-span-12 lg:col-span-4 flex flex-col gap-3">
+        <div class="flex items-center gap-1 bg-black/5 p-1 rounded-xl h-9">
+          <button data-mode="standard"
+            class="nav-pill active w-1/2 h-full rounded-lg text-[9px] font-bold uppercase">Day</button>
+          <button data-mode="nsfw" class="nav-pill w-1/2 h-full rounded-lg text-[9px] font-bold uppercase">Star</button>
+        </div>
+        <div class="space-y-1">
+          <label class="text-[9px] font-bold uppercase opacity-50 ml-1">Engine</label>
+          <select id="model" class="w-full h-9 px-3 font-bold text-xs"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-[9px] font-bold uppercase opacity-50 ml-1">Quality</label>
+            <select id="quality" class="w-full h-9 px-3 font-bold text-xs"></select>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[9px] font-bold uppercase opacity-50 ml-1">Size</label>
+            <select id="aspect" class="w-full h-9 px-3 font-bold text-xs"></select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-[9px] font-bold uppercase opacity-50 ml-1">Images</label>
+            <select id="count" class="w-full h-9 px-3 font-bold text-xs">
+              <option value="1">1 Spirit</option>
+              <option value="4" selected>4 Spirits</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[9px] font-bold uppercase opacity-50 ml-1">Seed</label>
+            <input id="seed" type="number" placeholder="Divine Seed" class="w-full h-9 px-3 font-bold text-xs">
+          </div>
+        </div>
+      </div>
+
+      <div class="col-span-12 lg:col-span-8 flex flex-col gap-3">
+        <div class="flex-1 flex flex-col space-y-1">
+          <div class="flex justify-between px-1">
+            <label class="text-[9px] font-bold uppercase opacity-50">The Vision</label>
+            <div class="flex gap-4 items-center">
+              <button onclick="clearPrompt()"
+                class="px-2 py-1 text-xs font-bold text-red-500 uppercase hover:text-red-400 transition-colors">Clear</button>
+              <button onclick="pastePrompt()"
+                class="px-2 py-1 text-xs font-bold text-[var(--text-main)] uppercase hover:opacity-70 transition-colors">Paste</button>
+              <button onclick="rollOracle()"
+                class="px-3 py-2 text-xs font-bold text-[var(--accent)] uppercase flex items-center gap-1.5 hover:brightness-125 transition-all border border-[var(--panel-border)] rounded-lg">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <path
+                    d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                </svg> Oracle
+              </button>
+            </div>
+          </div>
+          <textarea id="prompt" placeholder="What do you seek to manifest?"
+            class="w-full flex-1 p-3 resize-none text-sm leading-relaxed"></textarea>
+        </div>
+        <div class="grid grid-cols-6 gap-3">
+          <div class="col-span-3">
+            <textarea id="negativePrompt" placeholder="Wards (Banish artifacts...)"
+              class="w-full h-11 px-3 py-2 text-xs resize-none"></textarea>
+          </div>
+          <button id="matrixBtn" onclick="runMatrixCast()"
+            class="col-span-1 rounded-xl border-2 border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-colors flex items-center justify-center font-bold uppercase text-[10px] sm:text-[11px] tracking-widest shadow-lg min-h-[44px]">
+            <span id="btnMatrixText">Matrix</span>
+            <div id="btnMatrixLoader" class="hidden ml-2">
+              <div class="loader" style="width:12px;height:12px;border-width:2px;animation-duration:2s"></div>
+            </div>
+          </button>
+          <button id="generateBtn"
+            class="col-span-2 btn-magic flex items-center justify-center gap-2 font-bold uppercase text-[11px] sm:text-xs tracking-widest shadow-lg min-h-[44px]">
+            <span id="btnText">Manifest</span>
+            <div id="btnLoader" class="hidden">
+              <div class="loader"></div>
+            </div>
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div id="footerStatus" class="fixed bottom-10 left-1/2 -translate-x-1/2 glass-panel py-3 px-8 text-xs font-bold transition-all translate-y-32 opacity-0 pointer-events-none z-[150]"></div>
+  <div id="footerStatus"
+    class="fixed bottom-8 left-1/2 -translate-x-1/2 glass-panel py-3 px-8 text-xs font-bold transition-all translate-y-32 opacity-0 pointer-events-none z-[150]">
+  </div>
 
-    <script>
-        // FULL CATALOG OF MODELS from star_api.py
-        const SFW_MODELS = [
-            { "name": "Ani", "profile": "ani" },
-            { "name": "Aura", "profile": "aura" },
-            { "name": "Evo", "profile": "evo" },
-            { "name": "Flux1 D", "profile": "flux1d" },
-            { "name": "Fur", "profile": "fur" },
-            { "name": "FurXL Classic", "profile": "furxl" },
-            { "name": "Gen", "profile": "gen" },
-            { "name": "Glitch", "profile": "glitch" },
-            { "name": "Gothic", "profile": "gothic" },
-            { "name": "Hyper CGI", "profile": "hypercgi" },
-            { "name": "HyperX", "profile": "hyperx" },
-            { "name": "Muse", "profile": "muse" },
-            { "name": "Nai", "profile": "nai" },
-            { "name": "Neo", "profile": "neo" },
-            { "name": "Noob", "profile": "noob" },
-            { "name": "Pixel", "profile": "pixel" },
-            { "name": "Pony", "profile": "pony" },
-            { "name": "Rend", "profile": "rend" },
-            { "name": "Retro", "profile": "retro" },
-            { "name": "Supra", "profile": "supra" },
-            { "name": "Synth", "profile": "synth" },
-            { "name": "Toon", "profile": "toon" },
-            { "name": "Volt", "profile": "volt" },
-            { "name": "Wassie", "profile": "wassie" }
-        ];
+  <!-- Mobile Nav -->
+  <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-[200] glass-panel p-4 rounded-b-none border-t border-[var(--panel-border)] flex items-center justify-around shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+    <!-- Pinned Toggle Button for Mobile -->
+    <div id="mobileToggleStub" style="display: none; position: absolute; top: -42px; left: 50%; transform: translateX(-50%); z-index: 1001;">
+       <button onclick="toggleConsole()" class="bg-[var(--accent)] text-white px-8 py-2.5 rounded-t-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-2xl">
+         Expand
+       </button>
+    </div>
+    <button data-view="generate" class="mobile-nav-item flex flex-col items-center p-2 transition-all opacity-60 active">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+      <span class="text-[9px] font-black uppercase tracking-tighter">Forge</span>
+    </button>
+    <button data-view="tasks" class="mobile-nav-item flex flex-col items-center p-2 transition-all opacity-60">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span class="text-[9px] font-black uppercase tracking-tighter">Queue</span>
+    </button>
+    <button data-view="history" class="mobile-nav-item flex flex-col items-center p-2 transition-all opacity-60">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+      <span class="text-[9px] font-black uppercase tracking-tighter">Vault</span>
+    </button>
+  </nav>
 
-        const NSFW_MODELS = [
-            { "name": "Gen", "profile": "gen" },
-            { "name": "Ani", "profile": "ani" },
-            { "name": "Synth", "profile": "synth" },
-            { "name": "Fur", "profile": "fur" },
-            { "name": "Noob", "profile": "noob" },
-            { "name": "Aura", "profile": "aura" },
-            { "name": "Pixel", "profile": "pixel" },
-            { "name": "Hyper CGI", "profile": "hypercgi" },
-            { "name": "Volt", "profile": "volt" },
-            { "name": "Muse", "profile": "muse" },
-            { "name": "Rend", "profile": "rend" },
-            { "name": "Pony", "profile": "pony" },
-            { "name": "Neo", "profile": "neo" },
-            { "name": "Nai", "profile": "nai" },
-            { "name": "Retro", "profile": "retro" },
-            { "name": "Supra", "profile": "supra" },
-            { "name": "Evo", "profile": "evo" },
-            { "name": "Toon", "profile": "toon" },
-            { "name": "HyperX", "profile": "hyperx" },
-            { "name": "FurXL Classic", "profile": "furxl" },
-            { "name": "Illustrious", "profile": "illustrious" },
-            { "name": "Real Amateurs", "profile": "real_amateurs" },
-            { "name": "RealX", "profile": "realx" },
-            { "name": "Real Classic", "profile": "realclassic" }
-        ];
-        
-        let state = { 
-            serverUrl: window.location.origin, 
-            activeMode: localStorage.getItem("a_mode") || 'standard',
-            tasks: [],
-            history: JSON.parse(localStorage.getItem("a_history") || "[]")
-        };
+  <script>
+    window.__SERVER_URL__ = "__SERVER_URL__";
+    window.__SERVER_URL_NSFW__ = "__SERVER_URL_NSFW__";
 
-        const dom = { 
-            model: document.getElementById("model"), prompt: document.getElementById("prompt"), negativePrompt: document.getElementById("negativePrompt"), 
-            generateBtn: document.getElementById("generateBtn"), btnText: document.getElementById("btnText"), btnLoader: document.getElementById("btnLoader"),
-            gallery: document.getElementById("gallery"), count: document.getElementById("count"), aspect: document.getElementById("aspect"), 
-            quality: document.getElementById("quality"), seed: document.getElementById("seed"), historyList: document.getElementById("historyList"),
-            taskList: document.getElementById("taskList"), main: document.getElementById("mainContent"),
-            modal: document.getElementById("modal"), modalContainer: document.getElementById("modalContainer"),
-            modalImage: document.getElementById("modalImage"), modalPrompt: document.getElementById("modalPrompt"), 
-            downloadImageBtn: document.getElementById("downloadImageBtn")
-        };
+    const DAY_MODELS = [
+      "Ani", "Aura", "Evo", "Flux1 D", "Fur", "FurXL Classic", "Gen", "Glitch", "Gothic",
+      "Hyper CGI", "HyperX", "Muse", "Nai", "Neo", "Noob", "Pixel", "Pony", "Rend",
+      "Retro", "Supra", "Synth", "Toon", "Volt", "Wassie"
+    ];
+    const STAR_MODELS = [
+      "Gen", "Ani", "Synth", "Fur", "Noob", "Aura", "Pixel", "Hyper CGI",
+      "Volt", "Muse", "Rend", "Pony", "Neo", "Nai", "Retro", "Supra",
+      "Evo", "Toon", "HyperX", "FurXL Classic", "Illustrious", "Real Amateurs",
+      "RealX", "Real Classic"
+    ];
+    const ASPECT_CHOICES = ["1:1", "16:9", "5:2", "4:5", "4:7"];
+    const QUALITY_CHOICES = ["Fast", "High Quality"];
 
-        function setFooterMsg(msg) {
-            const f = document.getElementById("footerStatus"); f.textContent = msg;
-            f.classList.remove("translate-y-32", "opacity-0");
-            setTimeout(() => f.classList.add("translate-y-32", "opacity-0"), 3000);
+    const state = {
+      serverUrl: "",
+      activeMode: localStorage.getItem("a_mode") || "standard",
+      activeRequestId: localStorage.getItem("a_active_request_id") || "",
+      activeRequest: null,
+      historyPage: 1,
+      historyLimit: 20,
+      historyHasMore: true,
+      historyLoaded: false,
+      loadingHistory: false,
+      currentPoll: null
+    };
+
+    const dom = {
+      model: document.getElementById("model"),
+      prompt: document.getElementById("prompt"),
+      negativePrompt: document.getElementById("negativePrompt"),
+      generateBtn: document.getElementById("generateBtn"),
+      btnText: document.getElementById("btnText"),
+      btnLoader: document.getElementById("btnLoader"),
+      gallery: document.getElementById("gallery"),
+      historyList: document.getElementById("historyList"),
+      taskList: document.getElementById("taskList"),
+      count: document.getElementById("count"),
+      aspect: document.getElementById("aspect"),
+      quality: document.getElementById("quality"),
+      seed: document.getElementById("seed"),
+      footerStatus: document.getElementById("footerStatus"),
+      loadMoreBtn: document.getElementById("loadMoreBtn"),
+      activeRequestBadge: document.getElementById("activeRequestBadge"),
+      backendStatus: document.getElementById("backendStatus"),
+      matrixBtn: document.getElementById("matrixBtn"),
+      btnMatrixText: document.getElementById("btnMatrixText"),
+      btnMatrixLoader: document.getElementById("btnMatrixLoader")
+    };
+
+    function isUnresolved(v) {
+      return !v || v.startsWith("__") || v.includes("REPLACE");
+    }
+
+    function resolveServerUrl(mode) {
+      const std = isUnresolved(window.__SERVER_URL__) ? window.location.origin : window.__SERVER_URL__;
+      const nsfw = isUnresolved(window.__SERVER_URL_NSFW__) ? std : window.__SERVER_URL_NSFW__;
+      return (mode === "nsfw" ? nsfw : std).replace(/\/$/, "");
+    }
+
+    function setFooterMsg(msg, kind = "info") {
+      dom.footerStatus.textContent = msg;
+      dom.footerStatus.style.borderColor = kind === "error" ? "rgba(239,68,68,0.35)" : "var(--panel-border)";
+      dom.footerStatus.classList.remove("translate-y-32", "opacity-0");
+      setTimeout(() => dom.footerStatus.classList.add("translate-y-32", "opacity-0"), 3200);
+    }
+
+    function setLoading(loading) {
+      dom.generateBtn.disabled = loading;
+      dom.btnText.textContent = loading ? "Weaving..." : "Manifest";
+      dom.btnLoader.classList.toggle("hidden", !loading);
+    }
+
+    function saveActiveRequest(requestId) {
+      state.activeRequestId = requestId || "";
+      if (requestId) localStorage.setItem("a_active_request_id", requestId);
+      else localStorage.removeItem("a_active_request_id");
+      renderActiveRequest();
+    }
+
+    function renderActiveRequest() {
+      if (!state.activeRequestId) {
+        dom.activeRequestBadge.textContent = "No active request";
+        document.getElementById("retryBtn").disabled = true;
+      } else {
+        dom.activeRequestBadge.textContent = `Active request: ${state.activeRequestId.slice(0, 8)}...`;
+        document.getElementById("retryBtn").disabled = false;
+      }
+    }
+
+    function applyMode(mode) {
+      state.activeMode = mode;
+      document.body.dataset.mode = mode;
+      state.serverUrl = resolveServerUrl(mode);
+      const previousModel = dom.model.value || localStorage.getItem("a_model") || "";
+      const previousQuality = dom.quality.value || localStorage.getItem("a_quality") || "";
+      const previousAspect = dom.aspect.value || localStorage.getItem("a_aspect") || "";
+      const models = mode === "nsfw" ? STAR_MODELS : DAY_MODELS;
+      dom.model.innerHTML = models.map(name => `<option value="${name}">${name}</option>`).join("");
+      dom.quality.innerHTML = QUALITY_CHOICES
+        .map(q => `<option value="${q}">${q}</option>`).join("");
+      dom.aspect.innerHTML = ASPECT_CHOICES
+        .map(a => `<option value="${a}">${a}</option>`).join("");
+      document.querySelectorAll("[data-mode]").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
+      localStorage.setItem("a_mode", mode);
+      dom.model.value = models.includes(previousModel) ? previousModel : (models[0] || "Gen");
+      dom.quality.value = QUALITY_CHOICES.includes(previousQuality) ? previousQuality : QUALITY_CHOICES[0];
+      dom.aspect.value = ASPECT_CHOICES.includes(previousAspect) ? previousAspect : ASPECT_CHOICES[0];
+      localStorage.setItem("a_model", dom.model.value);
+      localStorage.setItem("a_quality", dom.quality.value);
+      localStorage.setItem("a_aspect", dom.aspect.value);
+
+      refreshCurrentJob();
+    }
+
+    function getPayload() {
+      const realm = state.activeMode === "nsfw" ? "star" : "day";
+      return {
+        prompt: dom.prompt.value.trim(),
+        model: dom.model.value,
+        nsfw: state.activeMode === "nsfw",
+        count: parseInt(dom.count.value, 10),
+        aspect: dom.aspect.value,
+        quality: dom.quality.value,
+        negative_prompt: dom.negativePrompt.value.trim(),
+        seed: dom.seed.value ? parseInt(dom.seed.value, 10) : null,
+        client_id: `client-${Date.now()}`,
+        realm
+      };
+    }
+
+    async function apiFetch(path, opts = {}) {
+      if (!state.serverUrl || state.serverUrl.startsWith("file://")) {
+        console.warn("Invalid server URL or file:// protocol. Skipping fetch:", path);
+        throw new Error("Local File Protocol detected. Please run via a web server.");
+      }
+      try {
+        const resp = await fetch(`${state.serverUrl}${path}`, {
+          headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
+          ...opts
+        });
+        const text = await resp.text();
+        let data = null;
+        try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
+        if (!resp.ok) {
+          const err = new Error(data?.detail || data?.error || `HTTP ${resp.status}`);
+          err.status = resp.status;
+          err.data = data;
+          throw err;
         }
+        return data;
+      } catch (e) {
+        console.error("apiFetch error:", e);
+        throw e;
+      }
+    }
 
-        function applyMode(mode) {
-            state.activeMode = mode; document.body.dataset.mode = mode;
-            const models = mode === 'nsfw' ? NSFW_MODELS : SFW_MODELS;
-            dom.model.innerHTML = models.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
-            dom.quality.innerHTML = ['Fast', 'High Quality'].map(q => `<option value="${q}">${q}</option>`).join('');
-            dom.aspect.innerHTML = ['1:1', '16:9', '4:5', '4:7'].map(a => `<option value="${a}">${a}</option>`).join('');
-            document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-            localStorage.setItem("a_mode", mode);
-            renderHistory();
-        }
+    function currentJobCard(job) {
+      const created = job?.created_at ? new Date(job.created_at).toLocaleTimeString() : "Pending";
+      const promptEscaped = escapeHtml(job?.prompt || "Inspiration being woven...");
+      const isDone = job?.status === "done";
+      const isError = job?.status === "error";
+      const isMatrix = job?.request_id && job.request_id.startsWith("matrix-");
 
-        async function runGeneration() {
-            const prompt = dom.prompt.value.trim();
-            if (!prompt) return setFooterMsg("Inspiration required.");
-            
-            const taskId = `v-${Date.now()}`;
-            const payload = { 
-                prompt, model: dom.model.value, nsfw: state.activeMode === 'nsfw', 
-                count: parseInt(dom.count.value), aspect: dom.aspect.value, quality: dom.quality.value,
-                negative_prompt: dom.negativePrompt.value, seed: dom.seed.value ? parseInt(dom.seed.value) : null,
-                client_id: taskId
-            };
+      return `
+        <div class="glass-panel p-5 relative overflow-hidden transition-all hover:border-[var(--accent)]" data-request-id="${job?.request_id}">
+          ${isDone ? '<div class="absolute top-0 right-0 p-2"><svg class="text-[var(--accent)] w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>' : ''}
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter bg-[var(--accent)] text-white shadow-sm">${job?.realm || "day"}</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">${isDone ? "Manifested" : (isError ? "Fractured" : "Weaving...")}</span>
+              </div>
+              <div class="font-bold text-sm tracking-tight leading-snug line-clamp-2" title="${promptEscaped}">${promptEscaped}</div>
+            </div>
+          </div>
+          
+          <div class="mt-4 grid grid-cols-2 gap-y-2 gap-x-4 text-[11px]">
+            <div class="flex flex-col">
+              <span class="text-[9px] uppercase font-bold text-[var(--text-muted)] opacity-50">Model</span>
+              <span class="font-bold truncate">${job?.model || "Casting..."}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[9px] uppercase font-bold text-[var(--text-muted)] opacity-50">Time</span>
+              <span class="font-bold text-[var(--text-muted)]">${created}</span>
+            </div>
+          </div>
 
-            setLoading(true);
-            state.tasks.unshift({ id: taskId, prompt, status: 'weaving', payload });
-            dom.gallery.innerHTML = '<div class="py-24 animate-pulse opacity-50 cinematic-text text-2xl uppercase tracking-widest">Weaving Vision...</div>';
-
-            try {
-                const resp = await fetch(`${state.serverUrl}/generate`, { 
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
-                });
-                if (!resp.ok) throw new Error("Timeout");
-                const res = await resp.json();
-                
-                const newEntry = { id: taskId, prompt, model: payload.model, image_urls: res.image_urls, created: new Date().toISOString() };
-                state.history.unshift(newEntry);
-                localStorage.setItem("a_history", JSON.stringify(state.history));
-                
-                renderVisions(res.image_urls, taskId);
-                renderHistory();
-            } catch (e) {
-                console.warn("Connection lost, entering recovery mode...");
-                setFooterMsg("Vision unraveled. Checking server...");
-                setTimeout(() => attemptRecovery(taskId, payload), 5000);
-            } finally { setLoading(false); }
-        }
-
-        async function attemptRecovery(taskId, payload) {
-            try {
-                const resp = await fetch(`${state.serverUrl}/fetch-by-client-id/${taskId}`);
-                if (resp.ok) {
-                    const res = await resp.json();
-                    if (res.image_urls && res.image_urls.length > 0) {
-                        const newEntry = { id: taskId, prompt: payload.prompt, model: payload.model, image_urls: res.image_urls, created: new Date().toISOString() };
-                        state.history.unshift(newEntry);
-                        localStorage.setItem("a_history", JSON.stringify(state.history));
-                        renderVisions(res.image_urls, taskId);
-                        renderHistory();
-                        setFooterMsg("Vision recovered from Aether.");
-                        return;
-                    }
-                }
-                dom.gallery.innerHTML = '<div class="py-24 text-red-400 font-bold uppercase">Vision Lost. Check Queue to retry.</div>';
-            } catch(err) {}
-        }
-
-        function renderVisions(urls, taskId) {
-            state.tasks = state.tasks.filter(t => t.id !== taskId);
-            dom.gallery.innerHTML = urls.map(url => `
-                <div class="bubble" onclick="openModal({url: '${url}', prompt: '${dom.prompt.value.replace(/'/g, "\\'")}'})">
-                    <div class="bubble-img-overlay"><img src="${url}" loading="lazy"></div>
-                    <div class="bubble-sphere"></div>
-                </div>
-            `).join('');
-            dom.main.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function renderHistory() {
-            if (!dom.historyList) return;
-            if (state.history.length === 0) {
-                dom.historyList.innerHTML = '<div class="col-span-full py-12 text-center opacity-20">The Vault is empty.</div>';
-                return;
+          <div class="mt-5 flex items-center gap-2">
+            ${isDone ? 
+              `<button class="btn-magic flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest shadow-md" onclick="resumeRequest('${job?.request_id}')">View Result</button>` :
+              (isError ? 
+                `<button class="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-500 text-[10px] font-bold uppercase tracking-widest border border-red-500/20" disabled>Failed</button>` :
+                `<button class="flex-1 py-2.5 rounded-xl bg-black/5 text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest border border-[var(--panel-border)] flex items-center justify-center gap-2 cursor-wait" disabled>
+                   <div class="loader" style="width:10px;height:10px;border-width:1.5px;border-color:var(--text-muted);border-top-color:transparent"></div>
+                   Wandering...
+                 </button>`)
             }
-            dom.historyList.innerHTML = state.history.flatMap(entry => 
-                entry.image_urls.map(url => `
-                    <div class="art-frame" onclick="openModal({url: '${url}', prompt: '${entry.prompt.replace(/'/g, "\\'")}'})">
-                        <img src="${url}" class="w-full aspect-square object-cover" loading="lazy">
-                    </div>
-                `)
-            ).join('');
+            <button class="px-3 py-2.5 rounded-xl border border-[var(--panel-border)] hover:bg-black/5 transition-colors" onclick="copyRequestId('${job?.request_id}')" title="Copy ID">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function setProgress(step) {
+      const matrix = document.getElementById("progressMatrix");
+      if (step === -1) {
+        matrix.classList.remove("active");
+        document.querySelectorAll(".progress-step").forEach(s => s.classList.remove("done", "active"));
+        return;
+      }
+      matrix.classList.add("active");
+      document.querySelectorAll(".progress-step").forEach((s, idx) => {
+        s.classList.toggle("done", idx < step);
+        s.classList.toggle("active", idx === step);
+      });
+    }
+
+    async function runMatrixCast() {
+      const payload = getPayload();
+      if (!payload.prompt) return setFooterMsg("Inspiration required.", "error");
+
+      const models = state.activeMode === "nsfw" ? STAR_MODELS : DAY_MODELS;
+
+      dom.gallery.style.display = "none";
+      const mGallery = document.getElementById("matrixGallery");
+      mGallery.classList.remove("hidden");
+      mGallery.classList.add("grid");
+
+      // Build placeholders
+      mGallery.innerHTML = models.map(m => `
+        <div id="matrix-cell-${m.replace(/\s+/g, '-')}" class="art-frame aspect-square flex flex-col items-center justify-center bg-black/40 border border-white/10 relative group">
+          <span class="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-widest absolute bottom-3 z-20 group-hover:opacity-0 transition-opacity">${m}</span>
+          <div class="loader opacity-20 hidden"></div>
+          <img src="" class="absolute inset-0 w-full h-full object-cover hidden transition-opacity duration-1000 opacity-0 z-10">
+        </div>
+      `).join("");
+
+      dom.generateBtn.disabled = true;
+      dom.matrixBtn.disabled = true;
+      dom.btnMatrixText.textContent = "Casting...";
+      dom.btnMatrixLoader.classList.remove("hidden");
+
+      let activeIds = [];
+      try {
+        setView("generate");
+        toggleConsole("expand");
+        setFooterMsg(`Submitting ${models.length} Matrix Jobs...`, "info");
+        // We fire them all quickly. The backend Semaphore(1) handles the queueing.
+        for (const model of models) {
+          const mPayload = { ...payload, model };
+          const cell = document.getElementById(`matrix-cell-${model.replace(/\s+/g, '-')}`);
+          if (cell) cell.querySelector(".loader").classList.remove("hidden");
+
+          const res = await apiFetch("/generate", {
+            method: "POST",
+            body: JSON.stringify(mPayload)
+          });
+          activeIds.push({ id: res.request_id, model: model, payload: mPayload });
         }
 
-        function openModal(data) {
-            dom.modalImage.src = data.url;
-            dom.modalPrompt.textContent = data.prompt;
-            dom.downloadImageBtn.href = data.url;
-            dom.modal.classList.remove('hidden');
-            dom.modal.classList.add('flex');
-            setTimeout(() => {
-                dom.modal.classList.add('opacity-100');
-                dom.modalContainer.classList.remove('scale-95');
-            }, 10);
+        setFooterMsg("Matrix Jobs Queued. Processing sequentially...", "info");
+        await pollMatrixUntilDone(activeIds);
+      } catch (err) {
+        setFooterMsg("Matrix Error: " + err.message, "error");
+      } finally {
+        dom.generateBtn.disabled = false;
+        dom.matrixBtn.disabled = false;
+        dom.btnMatrixText.textContent = "Matrix";
+        dom.btnMatrixLoader.classList.add("hidden");
+        if (window.innerWidth < 1024) toggleConsole("minimize");
+      }
+    }
+
+    async function pollMatrixUntilDone(activeJobs) {
+      let active = [...activeJobs];
+
+      while (active.length > 0) {
+        try {
+          const reqIds = active.map(j => j.id);
+          const res = await apiFetch("/job-status-batch", {
+            method: "POST",
+            body: JSON.stringify({ request_ids: reqIds })
+          });
+
+          let stillActive = [];
+          for (const job of active) {
+            const data = res[job.id];
+            if (!data) { stillActive.push(job); continue; }
+
+            if (data.status === "done") {
+              const url = data.images && data.images.length ? data.images[0].r2_url : null;
+              const cell = document.getElementById(`matrix-cell-${job.model.replace(/\s+/g, '-')}`);
+              if (cell) {
+                cell.querySelector(".loader").classList.add("hidden");
+                if (url) {
+                  const img = cell.querySelector("img");
+                  img.src = url;
+                  img.classList.remove("hidden");
+                  // Trigger slow fade
+                  setTimeout(() => img.classList.remove("opacity-0"), 50);
+                  cell.onclick = () => popBubble(cell, url, { ...job.payload, ...data });
+                }
+              }
+            } else if (data.status === "error") {
+              const cell = document.getElementById(`matrix-cell-${job.model.replace(/\s+/g, '-')}`);
+              if (cell) {
+                cell.querySelector(".loader").classList.add("hidden");
+                cell.querySelector("span").textContent = "Failed";
+                cell.querySelector("span").classList.add("text-red-500");
+              }
+            } else {
+              stillActive.push(job);
+            }
+          }
+          active = stillActive;
+        } catch (err) {
+          console.warn("Matrix poll error", err);
         }
+        if (active.length > 0) await sleep(3000);
+      }
+      setFooterMsg("Matrix Cast Complete.", "info");
+      state.historyLoaded = false;
+    }
 
-        function closeModal() {
-            dom.modal.classList.remove('opacity-100');
-            dom.modalContainer.classList.add('scale-95');
-            setTimeout(() => {
-                dom.modal.classList.add('hidden');
-                dom.modal.classList.remove('flex');
-            }, 500);
+    async function runGeneration() {
+      setView("generate");
+      toggleConsole("expand");
+      dom.gallery.style.display = "";
+      document.getElementById("matrixGallery").classList.remove("grid");
+      document.getElementById("matrixGallery").classList.add("hidden");
+
+      const payload = getPayload();
+      if (!payload.prompt) return setFooterMsg("Inspiration required.", "error");
+
+      setLoading(true);
+      setProgress(0);
+      dom.gallery.innerHTML = '<div class="col-span-full py-24 animate-pulse opacity-50 cinematic-text text-2xl uppercase tracking-widest text-center">Weaving Vision...</div>';
+
+      try {
+        setProgress(1);
+        const res = await apiFetch("/generate", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        saveActiveRequest(res.request_id);
+        state.activeRequest = res;
+        updateTasksView(res);
+        setProgress(2);
+        if (res.status === "done" && res.result?.image_urls?.length) {
+          handleSuccess(res.result.image_urls, res.request_id, payload, res);
+          return;
         }
+        setFooterMsg(`Request accepted: ${res.request_id.slice(0, 8)}...`, "info");
+        await pollUntilDone(res.request_id, payload);
+      } catch (err) {
+        console.error(err);
+        setFooterMsg(`Generation failed to start: ${err.message}`, "error");
+        setProgress(-1);
+      } finally {
+        setLoading(false);
+        if (window.innerWidth < 1024) toggleConsole("minimize");
+      }
+    }
 
-        function setLoading(l) {
-            dom.generateBtn.disabled = l;
-            dom.btnText.textContent = l ? "Weaving..." : "Manifest";
-            dom.btnLoader.classList.toggle('hidden', !l);
+    async function pollUntilDone(requestId, payload, maxAttempts = 120) {
+      state.currentPoll = requestId;
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        if (state.currentPoll !== requestId) return false;
+        try {
+          const res = await apiFetch(`/job-status/${requestId}`);
+          if (state.currentPoll !== requestId) return false;
+          state.activeRequest = res;
+          updateTasksView(res);
+          if (res.images && res.images.length > 0) {
+            const urls = res.images.map(img => img.r2_url);
+            if (urls.length > (dom.gallery.querySelectorAll(".bubble").length)) {
+              renderGallery(urls, requestId, payload, res);
+            }
+          }
+          if (res.status === "done") {
+            const finalUrls = res.images?.length ? res.images.map(img => img.r2_url) : res.result?.image_urls;
+            if (finalUrls) {
+              setProgress(3);
+              handleSuccess(finalUrls, requestId, payload, res);
+              setTimeout(() => setProgress(-1), 3000);
+              return true;
+            }
+          }
+          if (res.status === "error") {
+            setFooterMsg(res.error || "Generation failed.", "error");
+            setProgress(-1);
+            return false;
+          }
+        } catch (err) {
+          console.warn("poll error", err);
         }
+        await sleep(backoffDelay(attempt));
+      }
+      return false;
+    }
 
-        function toggleConsole() { 
-            const isMin = document.getElementById('desktopConsole').classList.toggle('minimized');
-            document.getElementById('consoleToggleText').textContent = isMin ? 'Expand' : 'Minimize';
+    function backoffDelay(attempt) {
+      return Math.min(6000, 1500 + (attempt * 200));
+    }
+
+    function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+    async function resumeLastRequest() {
+      if (!state.activeRequestId) return setFooterMsg("No saved request to resume.", "error");
+      try {
+        const res = await apiFetch(`/resume/${state.activeRequestId}`);
+        state.activeRequest = res;
+        updateTasksView(res);
+        if (res.status === "done") {
+          const urls = res.images?.length ? res.images.map(i => i.r2_url) : (res.result?.image_urls || []);
+          handleSuccess(urls, state.activeRequestId, res, res);
+          return;
         }
-        
-        async function pastePrompt() { dom.prompt.value = await navigator.clipboard.readText(); }
-        function clearPrompt() { dom.prompt.value = ''; }
+        await pollUntilDone(state.activeRequestId, res);
+      } catch (err) {
+        setFooterMsg(`Resume failed: ${err.message}`, "error");
+      }
+    }
 
-        document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', (e) => {
-            const view = e.target.dataset.view;
-            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-            document.querySelectorAll('[data-view]').forEach(btn => btn.classList.remove('active'));
-            e.target.classList.add('active');
-            dom.main.scrollTo({ top: 0, behavior: 'auto' });
-        }));
+    async function resumeRequest(requestId) {
+      if (!requestId) return;
+      saveActiveRequest(requestId);
+      await resumeLastRequest();
+    }
 
-        document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => applyMode(b.dataset.mode)));
-        dom.generateBtn.addEventListener('click', runGeneration);
-        applyMode(state.activeMode);
-    </script>
+    let queueInterval = null;
+    async function refreshCurrentJob() {
+      if (queueInterval) clearInterval(queueInterval);
+      
+      const doRefresh = async () => {
+        try {
+          const res = await apiFetch(`/history?page=1&limit=10`);
+          // Show any job that isn't totally historical (Status = running or recently done)
+          const currentItems = (res.items || []).filter(it => it.status !== "done" || (new Date() - new Date(it.updated_at)) < 30000);
+          
+          if (currentItems.length > 0) {
+            dom.taskList.innerHTML = currentItems.map(job => currentJobCard(job)).join("");
+          } else if (state.activeRequestId) {
+            try {
+              const job = await apiFetch(`/job-status/${state.activeRequestId}`);
+              dom.taskList.innerHTML = currentJobCard(job);
+            } catch {
+              dom.taskList.innerHTML = '<div class="col-span-full py-20 text-center opacity-20 cinematic-text text-xl uppercase tracking-widest font-thin">Temple of Silence</div>';
+            }
+          } else {
+            dom.taskList.innerHTML = '<div class="col-span-full py-20 text-center opacity-20 cinematic-text text-xl uppercase tracking-widest font-thin">Temple of Silence</div>';
+          }
+        } catch (err) {
+          console.warn("Queue refresh error", err);
+        }
+      };
+
+      await doRefresh();
+      // Setup live polling while UI is on tasks tab
+      queueInterval = setInterval(() => {
+        const tasksView = document.getElementById("view-tasks");
+        if (tasksView && !tasksView.classList.contains("hidden")) {
+          doRefresh();
+        } else {
+          clearInterval(queueInterval);
+          queueInterval = null;
+        }
+      }, 4000);
+    }
+
+    function updateTasksView(job) {
+      if (!dom.taskList) return;
+      dom.taskList.innerHTML = job ? currentJobCard(job) : '<div class="col-span-full py-20 text-center opacity-20 cinematic-text text-xl uppercase tracking-widest">The queue is silent</div>';
+    }
+
+    function handleSuccess(urls, requestId, payload, meta = {}) {
+      saveActiveRequest(requestId);
+      state.activeRequest = meta || state.activeRequest;
+      renderGallery(urls, requestId, payload, meta);
+      updateTasksView({ ...payload, ...meta, request_id: requestId, status: "done" });
+      state.historyLoaded = false;
+      renderHistory();
+    }
+
+    function renderGallery(urls, requestId, payload, meta = {}) {
+      dom.gallery.innerHTML = urls.map((url, idx) => `
+        <div class="bubble" id="bubble-${requestId}-${idx}">
+          ${(url.includes(".r2.dev") || url.includes("cloudflare")) ? '<span class="vault-badge">Vaulted</span>' : ''}
+          <div class="bubble-img-overlay"><img src="${url}" alt="Image ${idx + 1}" loading="lazy"></div>
+          <div class="bubble-sphere"></div>
+          <canvas class="bubble-canvas" width="260" height="260"></canvas>
+        </div>
+      `).join("");
+      urls.forEach((url, idx) => {
+        const b = document.getElementById(`bubble-${requestId}-${idx}`);
+        if (b) b.onclick = () => popBubble(b, url, { ...payload, ...meta });
+      });
+    }
+
+    function populateInspector(data) {
+      const panel = document.getElementById("metaInspector");
+      if (!data || !data.prompt) {
+        panel.classList.add("hidden");
+        return;
+      }
+      panel.classList.remove("hidden");
+      document.getElementById("metaRealm").textContent = data.realm || "day";
+      document.getElementById("metaModel").textContent = data.model || "Standard";
+      document.getElementById("metaPrompt").textContent = data.prompt;
+      state.__inspected_data = data;
+    }
+
+    function popBubble(el, url, data) {
+      const canvas = el.querySelector("canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const particles = [];
+      for (let i = 0; i < 30; i++) {
+        particles.push({ x: 130, y: 130, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, size: Math.random() * 3, alpha: 1 });
+      }
+      const animate = () => {
+        ctx.clearRect(0, 0, 260, 260);
+        particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.alpha -= 0.03; ctx.fillStyle = `rgba(139, 92, 246, ${Math.max(0, p.alpha)})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); });
+        if (particles[0].alpha > 0) requestAnimationFrame(animate);
+      };
+      animate();
+      setTimeout(() => {
+        const reveal = document.getElementById("bubbleReveal");
+        document.getElementById("bubbleRevealImg").src = url;
+        document.getElementById("bubbleRevealDownload").href = url;
+        populateInspector(data);
+        reveal.style.display = "block";
+        setTimeout(() => reveal.classList.add("active"), 10);
+      }, 150);
+    }
+
+    function closeBubbleReveal(e) {
+      if (e && e.target.tagName === "IMG") return;
+      const reveal = document.getElementById("bubbleReveal");
+      reveal.classList.remove("active");
+      setTimeout(() => reveal.style.display = "none", 350);
+    }
+
+    function cloneActiveManifestation() {
+      const data = state.__inspected_data;
+      if (!data) return;
+      if (data.realm) applyMode(data.realm === "star" ? "nsfw" : "standard");
+      if (data.model) dom.model.value = data.model;
+      if (data.prompt) dom.prompt.value = data.prompt;
+      if (data.negative_prompt) dom.negativePrompt.value = data.negative_prompt;
+      if (data.aspect) dom.aspect.value = data.aspect;
+      if (data.quality) dom.quality.value = data.quality;
+      if (data.seed) dom.seed.value = data.seed;
+      closeBubbleReveal();
+      document.querySelector('[data-view="generate"]').click();
+      setFooterMsg("Visions cloned to Forge.", "info");
+    }
+
+    function openHistoryGroup(entry) {
+      const urls = (entry.images || []).map(img => img.r2_url).filter(Boolean);
+      if (!urls.length) return;
+      const reveal = document.getElementById("bubbleReveal");
+      const img = document.getElementById("bubbleRevealImg");
+      img.src = urls[0];
+      document.getElementById("bubbleRevealDownload").href = urls[0];
+      populateInspector(entry);
+
+      reveal.style.display = "block";
+      setTimeout(() => reveal.classList.add("active"), 10);
+    }
+
+    function appendHistoryItems(items, clear = false) {
+      if (clear) dom.historyList.innerHTML = "";
+      items.forEach(entry => {
+        const wrap = document.createElement("div");
+        wrap.className = "glass-panel p-3 cursor-pointer group";
+        wrap.onclick = (e) => { if (!e.target.closest("button")) openHistoryGroup(entry); };
+        wrap.innerHTML = `
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div class="min-w-0">
+              <div class="text-[9px] uppercase tracking-widest text-[var(--text-muted)]">${entry.realm || "day"} · ${entry.status || "done"}</div>
+              <div class="text-xs font-bold truncate">${escapeHtml(entry.prompt || "")}</div>
+            </div>
+            <button class="text-[9px] font-bold uppercase text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); resumeRequest('${entry.request_id}')">Resume</button>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            ${(entry.images || []).slice(0, 4).map(img => `<div class="art-frame"><img src="${img.r2_url}" class="w-full aspect-square object-cover" loading="lazy"></div>`).join("")}
+          </div>
+        `;
+        dom.historyList.appendChild(wrap);
+      });
+    }
+
+    async function loadHistoryPage() {
+      if (state.loadingHistory || !state.historyHasMore) return;
+      state.loadingHistory = true;
+      try {
+        const res = await apiFetch(`/history?page=${state.historyPage}&limit=${state.historyLimit}`);
+        const items = res.items || [];
+        if (state.historyPage === 1) {
+          state.historyLoaded = true;
+          appendHistoryItems(items, true);
+          localStorage.setItem("a_vault_cache", JSON.stringify(items));
+        } else {
+          appendHistoryItems(items, false);
+        }
+        state.historyHasMore = !!res.has_more;
+        state.historyPage += 1;
+        dom.loadMoreBtn.classList.toggle("hidden", true); // Hidden because we use infinite scroll
+      } catch (err) {
+        console.error(err);
+      } finally {
+        state.loadingHistory = false;
+      }
+    }
+
+    async function renderHistory(reset = false) {
+      if (!dom.historyList || document.getElementById("view-history").classList.contains("hidden")) return;
+      if (dom.historyList.innerHTML === "" && localStorage.getItem("a_vault_cache")) {
+        try { appendHistoryItems(JSON.parse(localStorage.getItem("a_vault_cache")), true); } catch (e) { }
+      }
+      if (state.historyLoaded && !reset) return;
+      state.historyPage = 1;
+      state.historyHasMore = true;
+      await loadHistoryPage();
+    }
+
+    // Infinite Scroll
+    const mainEl = document.getElementById("mainContent");
+    mainEl.onscroll = () => {
+      if (!document.getElementById("view-history").classList.contains("hidden")) {
+        if (mainEl.scrollTop + mainEl.clientHeight >= mainEl.scrollHeight - 300) loadHistoryPage();
+      }
+    };
+
+    // The Oracle Module
+    const ORACLE_PROMPTS = [
+      "(masterpiece, best quality:1.2), an ethereal glass cathedral floating in a nebula, hyper-detailed, incredibly beautiful, cinematic lighting",
+      "A cyberpunk neo-tokyo street vendor selling glowing mechanical cyber-pets, neon rim lighting, dynamic angle, rain, 8k resolution",
+      "Macro photography of a tiny bioluminescent forest growing inside a cracked glowing crystal ball, unreal engine 5 render, highly detailed",
+      "A dark fantasy warrior king made entirely of living shadow and smoke, holding a sword of starlight, dramatic stormy background, greg rutkowski style",
+      "(intricate details:1.1), portrait of a cybernetic angel with wings made of fiber optic cables, glowing datastreams, trending on artstation",
+      "A lush, overgrown sci-fi greenhouse on a spaceship overlooking a black hole, volumetric fog, cinematic colors"
+    ];
+
+    function rollOracle() {
+      const idx = Math.floor(Math.random() * ORACLE_PROMPTS.length);
+      dom.prompt.value = ORACLE_PROMPTS[idx];
+      dom.negativePrompt.value = "worst quality, low quality, bad anatomy, deformed, watermark, signature";
+      dom.aspect.value = "16:9";
+      dom.quality.value = "High Quality";
+      setFooterMsg("The Oracle has spoken.", "info");
+    }
+
+    // Aether Particles Overlay
+    function initAetherCanvas() {
+      const canvas = document.getElementById('aetherCanvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      const particles = [];
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      for (let i = 0; i < 40; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          size: Math.random() * 2 + 0.5,
+          shift: Math.random() * Math.PI * 2
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        // Color shifts based on mode (Day = Emerald/White, Star = Violet)
+        const isNsfw = state.activeMode === "nsfw";
+
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.shift += 0.01;
+
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+          if (p.y < 0) p.y = height;
+          if (p.y > height) p.y = 0;
+
+          const alpha = (Math.sin(p.shift) * 0.3) + 0.3;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = isNsfw ? `rgba(139, 92, 246, ${alpha})` : `rgba(16, 185, 129, ${alpha})`;
+          ctx.fill();
+        });
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+    initAetherCanvas();
+
+    function clearVault() { if (confirm("Clear local cache?")) { localStorage.removeItem("a_vault_cache"); dom.historyList.innerHTML = ""; reloadHistory(); } }
+    function clearPrompt() { dom.prompt.value = ""; dom.negativePrompt.value = ""; setFooterMsg("Vision cleared.", "info"); }
+    function pastePrompt() { navigator.clipboard.readText().then(text => dom.prompt.value = text); }
+    function toggleConsole(forceState) {
+      const el = document.getElementById("desktopConsole");
+      const stub = document.getElementById("mobileToggleStub");
+      let isMin = el.classList.contains("minimized");
+      if (forceState === "expand") isMin = false;
+      else if (forceState === "minimize") isMin = true;
+      else isMin = !isMin;
+
+      el.classList.toggle("minimized", isMin);
+      document.getElementById("consoleToggleText").textContent = isMin ? "Expand" : "Minimize";
+      if (stub) stub.style.display = isMin ? "block" : "none";
+    }
+    function reloadHistory() {
+      state.historyLoaded = false;
+      state.historyPage = 0;
+      dom.historyList.innerHTML = "";
+      renderHistory();
+    }
+    async function copyRequestId(id) { if (id) { await navigator.clipboard.writeText(id); setFooterMsg("Copied ID.", "info"); } }
+    function escapeHtml(v) { return String(v).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
+    async function checkBackend() { try { const res = await apiFetch("/health"); dom.backendStatus.textContent = res.status === "ok" ? "Backend Online" : "Backend Latency"; } catch { dom.backendStatus.textContent = "Backend Offline"; } }
+
+    function setView(v) {
+      document.querySelectorAll(".view").forEach(el => el.classList.add("hidden"));
+      const viewEl = document.getElementById(`view-${v}`);
+      if (viewEl) viewEl.classList.remove("hidden");
+      document.querySelectorAll("[data-view]").forEach(b => {
+        const isMatch = b.dataset.view === v;
+        b.classList.toggle("active", isMatch);
+        b.classList.toggle("bg-white/20", isMatch && !b.classList.contains("mobile-nav-item"));
+        b.classList.toggle("opacity-100", isMatch);
+        b.classList.toggle("opacity-60", !isMatch);
+      });
+      if (v === "history") renderHistory();
+
+      // Auto-minimize on mobile for non-forge tabs
+      if (window.innerWidth < 1024 && (v === "history" || v === "tasks")) {
+        toggleConsole("minimize");
+      }
+    }
+
+    document.querySelectorAll("[data-view]").forEach(btn => btn.addEventListener("click", (e) => setView(e.currentTarget.dataset.view)));
+
+    document.querySelectorAll("[data-mode]").forEach(btn => btn.addEventListener("click", () => applyMode(btn.dataset.mode)));
+    dom.generateBtn.addEventListener("click", runGeneration);
+
+    try {
+      applyMode(state.activeMode);
+      renderActiveRequest();
+      setInterval(checkBackend, 15000);
+      checkBackend();
+    } catch (e) {
+      console.error("Initialization error:", e);
+      setFooterMsg("Connect to Server for full functionality.", "info");
+    }
+  </script>
 </body>
+
 </html>
